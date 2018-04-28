@@ -1,0 +1,21 @@
+{'object': 'page',
+'entry': [
+{
+'id': '631129030611674',
+ 'time': 1520696370368,
+ 'messaging': [
+ {'sender': {'id': '1442492262545140'},
+ 'recipient': {'id': '631129030611674'},
+ 'timestamp': 1520696370349,
+ 'delivery': {'mids': ['mid.$cAAJk8QDDHetoQdZnMliEJEeyN2t5'], 'watermark': 1520696368946, 'seq': 0}}]}]}
+
+
+
+Incoming message :: {'object': 'page', 'entry': [{'id': '631129030611674', 'time': 1520697252115, 'messaging': [{'sender': {'id': '1442492262545140'}, 'recipient': {'id': '631129030611674'}, 'timestamp': 1520696341991, 'message': {'mid': 'mid.$cAAJk8QDDHetoQdX951iEJCyjpUU1', 'seq': 381043, 'text': 'O la la la', 'nlp': {'entities': {'bye': [{'confidence': 0.00036384253257274, 'value': 'true', '_entity': 'bye'}], 'thanks': [{'confidence': 0.003331003724245, 'value': 'true', '_entity': 'thanks'}], 'greetings': [{'confidence': 0.0011958585545865, 'value': 'true', '_entity': 'greetings'}]}}}}]}]}
+
+
+
+Incoming message :: {'object': 'page', 'entry': [{'id': '631129030611674', 'time': 1520697197880, 'messaging': [{'sender': {'id': '1442492262545140'}, 'recipient': {'id': '631129030611674'}, 'timestamp': 1520697197872, 'read': {'watermark': 1520697167281, 'seq': 0}}]}]}
+
+
+Bare Response :: {'object': 'page', 'entry': [{'id': '631129030611674', 'time': 1520697954070, 'messaging': [{'sender': {'id': '631129030611674'}, 'recipient': {'id': '1442492262545140'}, 'timestamp': 1520696345422, 'message': {'is_echo': True, 'app_id': 173767249903121, 'mid': 'mid.$cAAJk8QDDHetoQdYLTliEJDC-8Nhd', 'seq': 381047, 'text': 'o la la la'}}]}]}

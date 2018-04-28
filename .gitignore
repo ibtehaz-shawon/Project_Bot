@@ -1,0 +1,8 @@
+venv
+*.pyc
+staticfiles
+.env
+bot0 
+
+.idea/
+bot/__pycache__/

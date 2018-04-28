@@ -1,0 +1,27 @@
+{'object': 'page',
+'entry':
+[
+{'id': '631129030611674',
+'time': 1520695648451,
+'messaging':
+[
+{
+'sender':
+{'id': '1442492262545140'},
+'recipient':
+ {'id': '631129030611674'},
+ 'timestamp': 1520695647952,
+ 'message':
+ {'mid': 'mid.$cAAJk8QDDHetoQctm0FiEIYbsBWi4', 'seq': 381039, 'text': 'kdnsklnsfsldf',
+
+ 'nlp':
+  {
+  'entities':
+  {'location': [{'suggested': True, 'confidence': 0.83492, 'value': 'kdnsklnsfsldf', 'type': 'value', '_entity': 'location', '_body': 'kdnsklnsfsldf', '_start': 0, '_end': 13}],
+  'bye': [{'confidence': 0.04040062643157, 'value': 'true', '_entity': 'bye'}],
+  'thanks': [{'confidence': 0.013509658888707, 'value': 'true', '_entity': 'thanks'}],
+  'greetings': [{'confidence': 0.3768811814592, 'value': 'true', '_entity': 'greetings'}]}}}}]}]}
+
+
+
+Incoming message :: {'object': 'page', 'entry': [{'id': '631129030611674', 'time': 1520720058677, 'messaging': [{'sender': {'id': '1442492262545140'}, 'recipient': {'id': '631129030611674'}, 'timestamp': 1520720058167, 'message': {'mid': 'mid.$cAAJk8QDDHetoQz_fN1iEfqVaVC0o', 'seq': 381178, 'text': 'Bangladesh', 'nlp': {'entities': {'location': [{'suggested': True, 'confidence': 0.93398, 'value': 'Bangladesh', 'type': 'value', '_entity': 'location', '_body': 'Bangladesh', '_start': 0, '_end': 10}], 'bye': [{'confidence': 0.16215930255064, 'value': 'true', '_entity': 'bye'}], 'thanks': [{'confidence': 0.0046076654054972, 'value': 'true', '_entity': 'thanks'}], 'greetings': [{'confidence': 0.18370640811714, 'value': 'true', '_entity': 'greetings'}]}}}}]}]}

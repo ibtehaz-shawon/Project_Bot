@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error Logger!</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+
+<body class="container">
+<div>
+    {%if all_error_logs %}
+    <div class="row">
+        <br><br>
+        <div class="row" style="background-color: #757575; color: #ffffff">
+            <div class="col-md-3">
+                <h3 class="h3" align="center"> UserID </h3>
+            </div>
+
+            <div class="col-md-3">
+                <h3 class="h3" align="center">
+                Error Message</h3>
+            </div>
+
+            <div class="col-md-3">
+                <h3 class="h3" align="center">
+                Recorded Time</h3>
+            </div>
+
+            <div class="col-md-3">
+                <h3 class="h3" align="center">
+                 Error Place</h3>
+            </div>
+        </div>
+        <br>
+        {% for logs in all_error_logs %}
+        <div class="row" style="background-color: #BDBDBD; color: #212121">
+            <div class="col-md-3">
+                <p class="h6">
+                    {{ logs.userID }}
+                </p>
+            </div>
+
+            <div class="col-md-3">
+                <p class="h6">
+                    {{ logs.errorMessage }}
+                </p>
+            </div>
+
+            <div class="col-md-3">
+                <p class="h6">
+                    {{ logs.recordedTime }}
+                </p>
+            </div>
+
+            <div class="col-md-3">
+                <p class="h6">
+                    {{ logs.errorPlace }}
+                </p>
+            </div>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <h2 class="h2" align="center">No Logs Available!</h2>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
