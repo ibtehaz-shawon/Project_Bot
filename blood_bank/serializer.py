@@ -20,14 +20,6 @@ class HistorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class LoggingSerializer(serializers.ModelSerializer):
-#     # userID = UserSerializer(many=True, read_only=True)
-#
-#     class Meta:
-#         model = ErrorLog
-#         fields = '_all__'
-
-
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserStatus

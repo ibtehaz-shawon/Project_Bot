@@ -40,7 +40,7 @@ TAG_NLP_TYPE = 'nlp_reply'
 TAG_ERROR_INSTANCE_NO = 'instanceNumber'
 
 """
-insert_queue
+insert_queue - basically data dumping
 message insertion queue in the database
 this is vanilla message insertion queue. And It will insert everything 
 @:parameter message_data holds the entire JSON Data from messaging parameter
@@ -104,6 +104,8 @@ logs every error in the database
 def error_logger(error_message, error_code, facebook_id, error_subcode, error_type, error_position):
     if facebook_id is not None:
         db_user_id = find_actual_user_id(facebook_id)
+    else:
+        db_user_id = None
     if error_code is None:
         error_code = -1
     if error_subcode is None:
