@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import json
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.template import loader
 
 from django.views.decorators.csrf import csrf_exempt
@@ -19,14 +19,14 @@ and sends every scrap data to facebook_message file to handle and parsing.
 """
 
 
-# noinspection SpellCheckingInspection
+# noinspection SpellCheckingInspection,PyBroadException
 @csrf_exempt
 def index(request):
     if request.method == 'GET':
         if str(request.GET.get('hub.verify_token', 'no_verify_token')) == MESSENGER_VERIFY_TOKEN:
             return HttpResponse(request.GET.get('hub.challenge'))
         else:
-            error_logger("Unknown Request came in GET - Web-hook", None, 100, None, None, 'GET - Webhook')
+            error_logger("Unknown Request came in GET - Web-hook", None, 'GET - Webhook')
             return HttpResponse(template.render(), status=200)
     elif request.method == 'POST':
         try:
@@ -36,12 +36,11 @@ def index(request):
             return HttpResponse(status=200)
         except ValueError as err:
             print("Error Occurred: " + str(err))
-            error_logger(str(err), None, 100, None, None, "POST - ValueError - Webhook")
+            error_logger(str(err), None, "POST - ValueError - Webhook")
             return HttpResponse(status=200)
-        except:
-            print("Unknown Error Occurred parsing JSON POST from facebook")
-            error_logger("Unknown Error Occurred parsing JSON POST from facebook", None, 100, None, None,
-                         "POST - Unknown - Webhook")
+        except BaseException as error:
+            print("Broad exception handling "+str(error))
+            error_logger(str(error), None, "POST - Unknown - Webhook")
             return HttpResponse(status=200)
     else:
         return HttpResponse(template.render(), status=200)

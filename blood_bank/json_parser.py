@@ -122,6 +122,7 @@ process all normal facebook messages from here
 """
 
 
+# noinspection PyBroadException
 def basic_reply(message_data):
     print("Basic Reply box")
     status = False
@@ -139,11 +140,11 @@ def basic_reply(message_data):
         return HttpResponse(status=200)
     except ValueError as error:
         print("Error occurred in basic reply " + str(error))
-        error_logger(str(error), None, user_id, None, None, "basic reply")
+        error_logger(str(error), user_id, "basic reply")
         return HttpResponse(status=200)
-    except:
-        print("Unknown error in basic reply")
-        error_logger("Unknown error", None, user_id, None, None, "basic reply")
+    except BaseException as error:
+        print("Broad exception handling "+str(error))
+        error_logger("Broad exception handling "+str(error), user_id, "basic reply")
         return HttpResponse(status=200)
 
 

@@ -88,7 +88,7 @@ def insert_queue(message_data):
         return 1
     else:
         error_message = serialized_data.error_messages()
-        error_logger(error_message, None, user_id, None, None, 'insert_queue')
+        error_logger(error_message, user_id, 'insert_queue')
         return -1
 
 
@@ -101,7 +101,7 @@ logs every error in the database
 
 
 # noinspection SpellCheckingInspection
-def error_logger(error_message, error_code, facebook_id, error_subcode, error_type, error_position):
+def error_logger(error_message, facebook_id, error_position, error_code=-1, error_subcode=-1, error_type=-1):
     if facebook_id is not None:
         db_user_id = find_actual_user_id(facebook_id)
     else:
@@ -114,7 +114,7 @@ def error_logger(error_message, error_code, facebook_id, error_subcode, error_ty
         error_type = -1
 
     payload = {
-        TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(4))),
+        TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(30))),
         TAG_USER_ID: db_user_id,
         TAG_ERROR_MESSAGE: error_message,
         TAG_ERROR_CODE: error_code,
@@ -147,7 +147,7 @@ def unique_user_check(user_id):
             return False
     except ObjectDoesNotExist as obj:
         print("error occurred in unique user check")
-        error_logger(str(obj), None, user_id, None, None, 'unique_user_check')
+        error_logger(str(obj), user_id, 'unique_user_check')
         return True
 
 
@@ -172,7 +172,7 @@ def user_table_insertion(user_id):
         return 1
     else:
         error_message = serialized_data.error_messages()
-        error_logger(error_message, None, user_id, None, None, 'user_table_insertion')
+        error_logger(error_message, user_id, 'user_table_insertion')
         return -1
 
 
@@ -219,8 +219,7 @@ def find_actual_user_id(fb_user_id):
     request_query = get_user_table_object(fb_user_id=fb_user_id)
     if request_query is None:
         print("request_query came NONE")
-        error_logger(error_message='request_query came NONE', facebook_id=None,
-                     error_position='find_actual_user_id')
+        error_logger('request_query came NONE', None, 'find_actual_user_id')
         return None
     else:
         return request_query.userID
@@ -282,7 +281,7 @@ def create_user_status(fb_user_id):
             # Error occurred!
             error_message = serialized_data.error_messages()
             print("Error occurred creating new User Status " + str(error_message))
-            error_logger(error_message, None, fb_user_id, None, None, 'create_user_status')
+            error_logger(error_message, fb_user_id, 'create_user_status')
             return -1
     else:
         return -1
@@ -340,15 +339,15 @@ def get_user_status_object(fb_user_id):
             return request_query
         except ObjectDoesNotExist as obj:
             print("ObjectDoesNotExist occurred in find_actual_user_id " + str(obj))
-            error_logger(str(obj), None, fb_user_id, None, None, 'find_actual_user_id')
+            error_logger(str(obj), fb_user_id, 'find_actual_user_id')
             return None
         except AttributeError as attr:
             print("AttributeError occurred in find_actual_user_id " + str(attr))
-            error_logger(str(attr), None, fb_user_id, None, None, 'find_actual_user_id')
+            error_logger(str(attr), fb_user_id, 'find_actual_user_id')
             return None
         except TypeError as terr:
             print("TypeError occurred in find_actual_user_id " + str(terr))
-            error_logger(str(terr), None, fb_user_id, None, None, 'find_actual_user_id')
+            error_logger(str(terr), fb_user_id, 'find_actual_user_id')
             return None
 
 
@@ -366,14 +365,14 @@ def get_user_table_object(fb_user_id):
         return request_query
     except ObjectDoesNotExist as obj:
         print("ObjectDoesNotExist occurred in find_actual_user_id " + str(obj))
-        error_logger(str(obj), None, None, None, None, 'get_user_table_object')
+        error_logger(str(obj), None, 'get_user_table_object')
         return None
     except AttributeError as attr:
         print("AttributeError occurred in find_actual_user_id " + str(attr))
-        error_logger(str(attr), None, None, None, None, 'get_user_table_object')
+        error_logger(str(attr), None, 'get_user_table_object')
         return None
     except TypeError as terr:
         print("TypeError occurred in find_actual_user_id " + str(terr))
         user_table_insertion(100)
-        error_logger(str(terr), None, None, None, None, 'get_user_table_object')
+        error_logger(str(terr), None, 'get_user_table_object')
         return None
