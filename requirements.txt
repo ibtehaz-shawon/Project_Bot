@@ -6,7 +6,7 @@ djangorestframework==3.8.2
 gunicorn==19.7.1
 idna==2.6
 Markdown==2.6.11
-psycopg2==2.7.4
+psycopg2-binary==2.7.4
 python-decouple==3.1
 pytz==2018.4
 requests==2.18.4
