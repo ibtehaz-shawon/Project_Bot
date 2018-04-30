@@ -18,6 +18,7 @@ index function will receive the occasional facebook verify token request
 and sends every scrap data to facebook_message file to handle and parsing.
 """
 
+
 # noinspection SpellCheckingInspection
 @csrf_exempt
 def index(request):
@@ -39,7 +40,8 @@ def index(request):
             return HttpResponse(status=200)
         except:
             print("Unknown Error Occurred parsing JSON POST from facebook")
-            error_logger("Unknown Error Occurred parsing JSON POST from facebook", None, 100, None, None, "POST - Unknown - Webhook")
+            error_logger("Unknown Error Occurred parsing JSON POST from facebook", None, 100, None, None,
+                         "POST - Unknown - Webhook")
             return HttpResponse(status=200)
     else:
         return HttpResponse(template.render(), status=200)
