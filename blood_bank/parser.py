@@ -128,7 +128,7 @@ class Parser:
         status = False
         user_id = None
         try:
-            insert_queue(message_data)  # insert data to database.
+            # insert_queue(message_data)  # insert data to database.
             user_id = str(message_data['sender']['id'])
             user_table_insertion(user_id)
 

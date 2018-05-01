@@ -47,6 +47,7 @@ this is vanilla message insertion queue. And It will insert everything
 """
 
 
+@DeprecationWarning
 def insert_queue(message_data):
     message_text = message_data['message']['text']
     user_id = message_data['sender']['id']
