@@ -4,6 +4,7 @@ from django.http import HttpResponse
 
 from blood_bank.db_handler import error_logger, unique_user_check, user_table_insertion
 from blood_bank.message_reply import MessageReply
+from bot.settings import DEBUG
 
 """
 :argument incoming_message contains the incoming message data from facebook.
@@ -35,14 +36,14 @@ def facebook_message(incoming_message):
                     Parser().postback_response(message)
                     return HttpResponse(status=200)
                 else:
-                    print("Unknown handler box inside entry['messaging']")
+                    Parser().print_fucking_stuff("Unknown handler box inside entry['messaging']")
                     Parser().unknown_handle(message)
                     return HttpResponse(status=200)
         elif 'standby' in entry:
             Parser().standby(str(entry))
             return HttpResponse(status=200)
         else:
-            print("Unknown totally box")
+            Parser().print_fucking_stuff("Unknown totally box")
             Parser().unknown_handle(str(entry))
             return HttpResponse(status=200)
     return HttpResponse(status=200)
@@ -135,18 +136,19 @@ class Parser:
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
                 # TODO -> Status is always false here people.
-                status = Parser().facebook_nlp(message_data)
+                status = Parser().facebook_nlp(user_id, message_data['message'])
 
             if not status:
-                print("Status is false, do nothing, ----> !!")
                 MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
         except ValueError as error:
-            print("Error occurred in basic reply " + str(error) + "\n" + "message data --> " + str(message_data))
+            Parser().print_fucking_stuff("Error occurred in basic reply "
+                                         + str(error) + "\n" + "message data --> " + str(message_data))
             error_logger(str(error), user_id, "basic reply")
             return HttpResponse(status=200)
         except BaseException as error:
-            print("Broad exception handling (basic reply) " + str(error) + "\n" + "message data --> " + str(message_data))
+            Parser().print_fucking_stuff("Broad exception handling (basic reply) "
+                                         + str(error) + "\n" + "message data --> " + str(message_data))
             error_logger("Broad exception handling " + str(error), user_id, "basic reply")
             return HttpResponse(status=200)
 
@@ -155,8 +157,8 @@ class Parser:
     """
 
     @classmethod
-    def facebook_nlp(cls, message_data):
-        print("Facebook's NLP data -> " + str(message_data))
+    def facebook_nlp(cls, user_id, message_data):
+        print("Facebook's NLP data -> " + str(message_data["nlp"]) + "\n"+ "Original text "+message_data['text'])
         return False
 
     """
@@ -174,3 +176,8 @@ class Parser:
             return True
         else:
             return False
+
+    @classmethod
+    def print_fucking_stuff(cls, message):
+        if DEBUG:
+            print(message)

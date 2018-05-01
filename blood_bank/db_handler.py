@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from blood_bank.models import UserTable, UserStatus
 from blood_bank.serializer import DumpMessageSerializer, LoggerSerializer, UserSerializer, StatusSerializer
 from blood_bank.utility import nlp_parser
+from bot.settings import DEBUG
 
 TAG_TEXT = 'incomingText'
 TAG_USER_ID = 'userID'
@@ -103,6 +104,10 @@ logs every error in the database
 
 # noinspection SpellCheckingInspection
 def error_logger(error_message, facebook_id, error_position, error_code=-1, error_subcode=-1, error_type=-1):
+    if DEBUG:
+        # This message will only print if the debug is TRUE
+        print("Error occurred >> " + str(error_message) + " | Error pos >> "+str(error_position))
+
     if facebook_id is not None:
         db_user_id = find_actual_user_id(facebook_id)
     else:

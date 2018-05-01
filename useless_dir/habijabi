@@ -1,29 +1,19 @@
-{'object': 'page', 'entry': [{'id': '631129030611674', 'time': 1525178756614, 'messaging': [{'sender': {'id': '1442492262545140'}, 'recipient': {'id': '631129030611674'}, 'timestamp': 1525178756261, 'message': {'mid': 'mid.$cAAJk8QDDHetpTQI0pVjG7zrm2Jc9', 'seq': 390970, 'text': 'djdfhd', 'nlp': {'entities': {'location': [{'suggested': True, 'confidence': 0.83492, 'value': 'djdfhd', 'type': 'value', '_entity': 'location', '_body': 'djdfhd', '_start': 0, '_end': 6}], 'bye': [{'confidence': 0.04040062643157, 'value': 'true', '_entity': 'bye'}], 'thanks': [{'confidence': 0.013509658888707, 'value': 'true', '_entity': 'thanks'}], 'greetings': [{'confidence': 0.3768811814592, 'value': 'true', '_entity': 'greetings'}]}}}}]}]}
-
-
-
-{'sender':
-{'id': '1442492262545140'},
-
-'recipient':
-{'id': '631129030611674'},
-
-'timestamp': 1525180180682,
-
- 'message':
- {
- 'mid': 'mid.$cAAJk8QDDHetpTRfwyljG9KpmDeMq',
-  'seq': 390983,
-  'text': 'ggh\\]',
+Facebook's NLP data ->
+{
+'sender':
+{ 'id': '1442492262545140'
+},
+ 'recipient': {'id': '631129030611674'},
+ 'timestamp': 1525181256038,
+  'message': '
+  '{'mid': 'mid.$cAAJk8QDDHetpTShZZljG-MSP2q9u',
+  'seq': 390989, 'text': 'do u knw me',
   'nlp':
-  {
-  'entities':
-  {
-  'bye':
-  [{'confidence': 0.035431013286121, 'value': 'true', '_entity': 'bye'}],
-   'thanks': [{'confidence': 0.013517784576588, 'value': 'true', '_entity': 'thanks'}],
-    'greetings': [{'confidence': 0.20735959095124, 'value': 'true', '_entity': 'greetings'}]
-    }
-    }
-    }
-    }
+   {'entities':
+   {'bye':  [{'confidence': 0.036231650536326, 'value': 'true', '_entity': 'bye'}],
+   'thanks': [{'confidence': 0.0021487858734685, 'value': 'true', '_entity': 'thanks'}],
+   'greetings': [{'confidence': 0.0052181598102937, 'value': 'true', '_entity': 'greetings'}]
+   }
+   }
+   }
+   }
