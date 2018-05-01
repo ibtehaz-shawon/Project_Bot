@@ -171,28 +171,43 @@ class Parser:
         status_bye = status_greet = status_thank = status_loc = False
         message_reply = MessageReply()
         try:
-            bye_val = float(message_data["nlp"]['entities']['bye'][0]['confidence'])
-            thanks_val = float(message_data["nlp"]['entities']['thanks'][0]['confidence'])
-            greetings_val = float(message_data["nlp"]['entities']['greetings'][0]['confidence'])
-            location_val = float(message_data["nlp"]['entities']['location'][0]['confidence'])
+            if 'bye' in message_data["nlp"]['entities']:
+                bye_val = float(message_data["nlp"]['entities']['bye'][0]['confidence'])
+            else:
+                bye_val = 0.0
+
+            if 'thanks' in message_data["nlp"]['entities']:
+                thanks_val = float(message_data["nlp"]['entities']['thanks'][0]['confidence'])
+            else:
+                thanks_val = 0.0
+
+            if 'greetings' in message_data["nlp"]['entities']:
+                greetings_val = float(message_data["nlp"]['entities']['greetings'][0]['confidence'])
+            else:
+                greetings_val = 0.0
+
+            if 'location' in message_data["nlp"]['entities']:
+                location_val = float(message_data["nlp"]['entities']['location'][0]['confidence'])
+            else:
+                location_val = 0.0
 
             if bye_val > thanks_val and bye_val > greetings_val and bye_val > location_val:
                 if bye_val >= 0.85:
                     status_bye = True
                     ## Bye will cut all running processing for this user for a while.
-                    message_reply.echo_response(user_id, "Bye")
+                    message_reply.echo_response(user_id, "Bye :)")
             elif thanks_val > bye_val and  thanks_val > greetings_val and thanks_val > location_val:
                 if thanks_val >= 0.85:
                     status_thank = True
                     ## Thanks will do nothing.
-                    message_reply.echo_response(user_id, "Thanks")
+                    message_reply.echo_response(user_id, "Thanks :)")
             elif greetings_val > bye_val and greetings_val > thanks_val and greetings_val > location_val:
                 if greetings_val >= 0.85:
                     status_greet = True
                     ##TODO: Start work here.
                     message_reply.echo_response(user_id, "Hello :)")
             else:
-                pass
+                pass ## passing on location for now.
         except ValueError as error:
             Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
             error_logger(str(error), user_id, "facebook_nlp")
