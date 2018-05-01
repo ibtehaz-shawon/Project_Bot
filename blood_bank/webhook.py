@@ -31,16 +31,18 @@ def index(request):
     elif request.method == 'POST':
         try:
             incoming_message = json.loads(request.body.decode('utf-8'))
-            print("Incoming message :: ")
+            print("Incoming message :: " + str(incoming_message))
             facebook_message(incoming_message)
             return HttpResponse(status=200)
         except ValueError as err:
             print("Error Occurred: " + str(err))
-            error_logger(str(err), None, "POST - ValueError - Webhook")
+            error_logger(str(err) + "\n" + str(json.loads(request.body.decode('utf-8'))),
+                         None, "POST - ValueError - Webhook")
             return HttpResponse(status=200)
         except BaseException as error:
             print("Broad exception handling "+str(error))
-            error_logger(str(error), None, "POST - Unknown - Webhook")
+            error_logger(str(error) + "\n" + str(json.loads(request.body.decode('utf-8'))),
+                         None, "POST - Unknown - Webhook")
             return HttpResponse(status=200)
     else:
         return HttpResponse(template.render(), status=200)
