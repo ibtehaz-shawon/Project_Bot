@@ -148,11 +148,12 @@ def unique_user_check(user_id):
     try:
         request_query = UserTable.objects.filter(facebookUserID=user_id)
         if request_query.count() == 0:
+            print ("user id "+ str(user_id) +" is unique")
             return True
         else:
+            print ("user id "+ str(user_id) +" is [NOT] unique")
             return False
     except ObjectDoesNotExist as obj:
-        print("error occurred in unique user check")
         error_logger(str(obj), user_id, 'unique_user_check')
         return True
 

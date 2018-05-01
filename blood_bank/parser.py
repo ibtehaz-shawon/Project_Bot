@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.http import HttpResponse
 
-from blood_bank.db_handler import error_logger, unique_user_check, user_table_insertion
+from blood_bank.db_handler import error_logger, user_table_insertion
 from blood_bank.message_reply import MessageReply
 from bot.settings import DEBUG
 
@@ -131,11 +131,14 @@ class Parser:
         try:
             # insert_queue(message_data)  # insert data to database.
             user_id = str(message_data['sender']['id'])
-            user_table_insertion(user_id)
+            return_val = user_table_insertion(user_id)
+
+            if return_val == -1:
+                # TODO: error occurred in user table insertion checking. might need to kill the script for this user
+                pass
 
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
-                # TODO -> Status is always false here people.
                 status = Parser().facebook_nlp(user_id, message_data['message'])
 
             if not status:
@@ -158,45 +161,49 @@ class Parser:
 
     @classmethod
     def facebook_nlp(cls, user_id, message_data):
+        """
+        checks and parse facebook's nlp data, if more than 0.85 (except Location) it handles it here.
+        :param user_id: account holder user id.
+        :param message_data: nlp message data.
+        :return: boolean
+        """
         print("Facebook's NLP box")
-
+        status_bye = status_greet = status_thank = status_loc = False
+        message_reply = MessageReply()
         try:
-            byeVal = str(message_data["nlp"]['entities']['bye'][0]['confidence'])
-            thanksVal = ""
-            greetingsVal = ""
-            locationVal = ""
+            bye_val = float(message_data["nlp"]['entities']['bye'][0]['confidence'])
+            thanks_val = float(message_data["nlp"]['entities']['thanks'][0]['confidence'])
+            greetings_val = float(message_data["nlp"]['entities']['greetings'][0]['confidence'])
+            location_val = float(message_data["nlp"]['entities']['location'][0]['confidence'])
 
-            print ("Bye value is --> "+byeVal)
+            if bye_val > thanks_val and bye_val > greetings_val and bye_val > location_val:
+                if bye_val >= 0.85:
+                    status_bye = True
+                    ## Bye will cut all running processing for this user for a while.
+                    message_reply.echo_response(user_id, "Bye")
+            elif thanks_val > bye_val and  thanks_val > greetings_val and thanks_val > location_val:
+                if thanks_val >= 0.85:
+                    status_thank = True
+                    ## Thanks will do nothing.
+                    message_reply.echo_response(user_id, "Thanks")
+            elif greetings_val > bye_val and greetings_val > thanks_val and greetings_val > location_val:
+                if greetings_val >= 0.85:
+                    status_greet = True
+                    ##TODO: Start work here.
+                    message_reply.echo_response(user_id, "Hello :)")
+            else:
+                pass
         except ValueError as error:
             Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
             error_logger(str(error), user_id, "facebook_nlp")
         except BaseException as error:
             Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
             error_logger(str(error), user_id, "facebook_nlp")
-
-        # {'entities': {'location': [
-        #     {'suggested': True, 'confidence': 0.83492, 'value': 'ilkhlkhlk', 'type': 'value', '_entity': 'location',
-        #      '_body': 'ilkhlkhlk', '_start': 0, '_end': 9}],
-        #               'bye': [{'confidence': 0.04040062643157, 'value': 'true', '_entity': 'bye'}],
-        #               'thanks': [{'confidence': 0.013509658888707, 'value': 'true', '_entity': 'thanks'}],
-        #               'greetings': [{'confidence': 0.3768811814592, 'value': 'true', '_entity': 'greetings'}]}}
-        return False
-
-    """
-    new_user_handler
-    this table will handle data from echo, quick reply and basic reply and
-    check if the user_id is already there.
-    Simple function handler.
-    """
-
-    @classmethod
-    @DeprecationWarning
-    def new_user_handler(cls, user_id):
-        if not unique_user_check(user_id):
-            user_table_insertion(user_id)
-            return True
-        else:
-            return False
+        finally:
+            if status_bye or status_thank or status_greet:
+                return True
+            else:
+                return False
 
     @classmethod
     def print_fucking_stuff(cls, message):

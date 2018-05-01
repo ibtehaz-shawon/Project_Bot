@@ -12,13 +12,19 @@ TAG_MESSAGE = 'message'
 TAG_TEXT = 'text'
 
 """
-Dummy Response will only be used for testing purpose
+Message Response class
 """
 
 
 class MessageReply:
     @classmethod
     def echo_response(cls, user_id, response):
+        """
+        echo back the given message without any consequence
+        :param user_id: account holder user id
+        :param response: response sring that has to be sent
+        :return: void
+        """
         print ("Message reply -- > "+str(response))
         payload = {
             TAG_RECIPIENT: {
