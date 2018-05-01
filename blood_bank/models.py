@@ -67,7 +67,7 @@ class UserStatus(models.Model):
     getStartedStatus = models.BooleanField(default=False, blank=True)
     donationStatus = models.BooleanField(default=False, blank=True)
     informationStatus = models.BooleanField(default=False, blank=True)
-    donationAvailDate = models.DateField(blank=True)
+    donationAvailDate = models.DateField(blank=True, null=True)
 
 
 """

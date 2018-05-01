@@ -8,7 +8,7 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 
 from blood_bank.db_handler import error_logger
-from blood_bank.json_parser import facebook_message
+from blood_bank.parser import facebook_message
 from bot.settings import MESSENGER_VERIFY_TOKEN
 
 template = loader.get_template('blood_bank/webhook.html')
@@ -31,7 +31,7 @@ def index(request):
     elif request.method == 'POST':
         try:
             incoming_message = json.loads(request.body.decode('utf-8'))
-            print("Incoming message :: " + str(incoming_message))
+            print("Incoming message :: ")
             facebook_message(incoming_message)
             return HttpResponse(status=200)
         except ValueError as err:

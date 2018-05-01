@@ -17,39 +17,43 @@ def facebook_message(incoming_message):
             for message in entry['messaging']:
                 if 'message' in message:
                     if 'is_echo' in message['message']:
-                        json_parser().is_echo(message)
+                        Parser().is_echo(message)
                         return HttpResponse(status=200)
                     elif 'quick_reply' in message['message']:
-                        json_parser().quick_reply(message)
+                        Parser().quick_reply(message)
                         return HttpResponse(status=200)
                     else:
-                        json_parser().basic_reply(message)
+                        Parser().basic_reply(message)
                         return HttpResponse(status=200)
                 elif 'delivery' in message:
-                    json_parser().delivery_result(message)
+                    Parser().delivery_result(message)
                     return HttpResponse(status=200)
                 elif 'read' in message:
-                    json_parser().message_read(message)
+                    Parser().message_read(message)
                     return HttpResponse(status=200)
                 elif 'postback' in message:
-                    json_parser().postback_response(message)
+                    Parser().postback_response(message)
                     return HttpResponse(status=200)
                 else:
                     print("Unknown handler box inside entry['messaging']")
-                    json_parser().unknown_handle(message)
+                    Parser().unknown_handle(message)
                     return HttpResponse(status=200)
         elif 'standby' in entry:
-            json_parser().standby(str(entry))
+            Parser().standby(str(entry))
             return HttpResponse(status=200)
         else:
             print("Unknown totally box")
-            json_parser().unknown_handle(str(entry))
+            Parser().unknown_handle(str(entry))
             return HttpResponse(status=200)
     return HttpResponse(status=200)
 
 
-##
-class json_parser:
+# -----------------------------------------------------------
+# -----------------------------------------------------------
+# -----------------------------------------------------------
+# -----------------------------------------------------------
+# -----------------------------------------------------------
+class Parser:
     """
     is_echo function description here
     """
@@ -130,7 +134,8 @@ class json_parser:
 
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
-                status = json_parser().facebook_nlp(message_data)
+                # TODO -> Status is always false here people.
+                status = Parser().facebook_nlp(message_data)
 
             if not status:
                 # TODO -> handle echo back reply to do other stuff
@@ -151,6 +156,7 @@ class json_parser:
 
     @classmethod
     def facebook_nlp(cls, message_data):
+        print("Facebook's NLP data -> "+message_data)
         return False
 
     """
