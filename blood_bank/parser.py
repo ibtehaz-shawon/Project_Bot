@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.http import HttpResponse
 
-from blood_bank.db_handler import insert_queue, error_logger, unique_user_check, user_table_insertion
+from blood_bank.db_handler import error_logger, unique_user_check, user_table_insertion
 from blood_bank.message_reply import MessageReply
 
 """
@@ -130,7 +130,8 @@ class Parser:
         try:
             # insert_queue(message_data)  # insert data to database.
             user_id = str(message_data['sender']['id'])
-            user_table_insertion(user_id)
+            print("User ID is "+str(user_id))
+            # user_table_insertion(user_id)
 
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
@@ -138,11 +139,10 @@ class Parser:
                 status = Parser().facebook_nlp(message_data)
 
             if not status:
-                # TODO -> handle echo back reply to do other stuff
                 MessageReply().echo_response(user_id, str(message_data['message']['text'].lower()))
             return HttpResponse(status=200)
         except ValueError as error:
-            print("Error occurred in basic reply " + str(error))
+            print("Error occurred in basic reply " + str(error)+ "\n" + "message data --> "+str(message_data))
             error_logger(str(error), user_id, "basic reply")
             return HttpResponse(status=200)
         except BaseException as error:
