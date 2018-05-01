@@ -158,7 +158,8 @@ class Parser:
 
     @classmethod
     def facebook_nlp(cls, user_id, message_data):
-        print("Facebook's NLP data -> " + str(message_data["nlp"]) + "\n"+ "Original text "+message_data['text'])
+        print("Facebook's NLP data -> " + str(message_data["nlp"]) + "\n"
+              + "Original text "+ str(message_data['text']))
         return False
 
     """
