@@ -158,8 +158,28 @@ class Parser:
 
     @classmethod
     def facebook_nlp(cls, user_id, message_data):
-        print("Facebook's NLP data -> " + str(message_data["nlp"]) + "\n"
-              + "Original text "+ str(message_data['text']))
+        print("Facebook's NLP box")
+
+        try:
+            byeVal = str(message_data["nlp"]['entities']['bye'][0]['confidence'])
+            thanksVal = ""
+            greetingsVal = ""
+            locationVal = ""
+
+            print ("Bye value is --> "+byeVal)
+        except ValueError as error:
+            Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
+            error_logger(str(error), user_id, "facebook_nlp")
+        except BaseException as error:
+            Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
+            error_logger(str(error), user_id, "facebook_nlp")
+
+        # {'entities': {'location': [
+        #     {'suggested': True, 'confidence': 0.83492, 'value': 'ilkhlkhlk', 'type': 'value', '_entity': 'location',
+        #      '_body': 'ilkhlkhlk', '_start': 0, '_end': 9}],
+        #               'bye': [{'confidence': 0.04040062643157, 'value': 'true', '_entity': 'bye'}],
+        #               'thanks': [{'confidence': 0.013509658888707, 'value': 'true', '_entity': 'thanks'}],
+        #               'greetings': [{'confidence': 0.3768811814592, 'value': 'true', '_entity': 'greetings'}]}}
         return False
 
     """

@@ -12,8 +12,12 @@ Facebook's NLP data ->
    {'entities':
    {'bye':  [{'confidence': 0.036231650536326, 'value': 'true', '_entity': 'bye'}],
    'thanks': [{'confidence': 0.0021487858734685, 'value': 'true', '_entity': 'thanks'}],
-   'greetings': [{'confidence': 0.0052181598102937, 'value': 'true', '_entity': 'greetings'}]
+   'greetings': [{'confidence': 0.0052181598102937, 'value': 'true', '_entity': 'greetings'}],
+   'location': [{'suggested': True, 'confidence': 0.83492, 'value': 'ilkhlkhlk', 'type': 'value', '_entity': 'location', '_body': 'ilkhlkhlk', '_start': 0, '_end': 9}]
    }
    }
    }
    }
+
+
+{'entities': {'location': [{'suggested': True, 'confidence': 0.83492, 'value': 'ilkhlkhlk', 'type': 'value', '_entity': 'location', '_body': 'ilkhlkhlk', '_start': 0, '_end': 9}], 'bye': [{'confidence': 0.04040062643157, 'value': 'true', '_entity': 'bye'}], 'thanks': [{'confidence': 0.013509658888707, 'value': 'true', '_entity': 'thanks'}], 'greetings': [{'confidence': 0.3768811814592, 'value': 'true', '_entity': 'greetings'}]}}
