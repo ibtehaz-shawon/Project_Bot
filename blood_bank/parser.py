@@ -130,8 +130,7 @@ class Parser:
         try:
             # insert_queue(message_data)  # insert data to database.
             user_id = str(message_data['sender']['id'])
-            print("User ID is "+str(user_id))
-            # user_table_insertion(user_id)
+            user_table_insertion(user_id)
 
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
@@ -139,15 +138,15 @@ class Parser:
                 status = Parser().facebook_nlp(message_data)
 
             if not status:
-                print ("Status is false, do nothing, ----> !!")
-                # MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
+                print("Status is false, do nothing, ----> !!")
+                MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
         except ValueError as error:
-            print("Error occurred in basic reply " + str(error)+ "\n" + "message data --> "+str(message_data))
+            print("Error occurred in basic reply " + str(error) + "\n" + "message data --> " + str(message_data))
             error_logger(str(error), user_id, "basic reply")
             return HttpResponse(status=200)
         except BaseException as error:
-            print("Broad exception handling " + str(error) + "\n" + "message data --> "+str(message_data))
+            print("Broad exception handling (basic reply) " + str(error) + "\n" + "message data --> " + str(message_data))
             error_logger("Broad exception handling " + str(error), user_id, "basic reply")
             return HttpResponse(status=200)
 
@@ -157,7 +156,7 @@ class Parser:
 
     @classmethod
     def facebook_nlp(cls, message_data):
-        print("Facebook's NLP data -> "+message_data)
+        print("Facebook's NLP data -> " + str(message_data))
         return False
 
     """
