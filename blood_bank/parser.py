@@ -146,7 +146,7 @@ class Parser:
             error_logger(str(error), user_id, "basic reply")
             return HttpResponse(status=200)
         except BaseException as error:
-            print("Broad exception handling " + str(error))
+            print("Broad exception handling " + str(error) + "\n" + "message data --> "+str(message_data))
             error_logger("Broad exception handling " + str(error), user_id, "basic reply")
             return HttpResponse(status=200)
 

@@ -6,3 +6,7 @@ bot0
 
 .idea/
 bot/__pycache__/
+
+useless_dir/
+blood_bank/__pycache__/
+blood_bank/migrations/__pycache__/
