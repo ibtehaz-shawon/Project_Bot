@@ -19,6 +19,7 @@ Dummy Response will only be used for testing purpose
 class MessageReply:
     @classmethod
     def echo_response(cls, user_id, response):
+        print ("Message reply -- > "+str(response))
         payload = {
             TAG_RECIPIENT: {
                 TAG_ID: user_id
