@@ -20,20 +20,20 @@
     <div class="row">
         <br><br>
         <div class="row" style="background-color: #757575; color: #ffffff">
-            <div class="col-md-3">
+            <div class="col-md-5">
                 <h3 class="h3" align="center"> Error Instance </h3>
             </div>
 
-            <div class="col-sm-2">
-                <h3 class="h3" align="center">UserID</h3>
-            </div>
+            <!--<div class="col-sm-2">-->
+                <!--<h3 class="h3" align="center">UserID</h3>-->
+            <!--</div>-->
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <h3 class="h3" align="center">
                 Error Message</h3>
             </div>
 
-            <div class="col-sm-2">
+            <div class="col-md-2">
                 <h3 class="h3" align="center">
                 Recorded Time</h3>
             </div>
@@ -47,25 +47,25 @@
         {% for logs in all_error_logs %}
         <div class="row" style="background-color: #BDBDBD; color: #212121">
 
-            <div class="col-md-3">
+            <div class="col-md-5">
                 <p class="h6">
                     {{ logs.instanceNumber }}
                 </p>
             </div>
 
-            <div class="col-sm-2">
-                <p class="h6">
-                    {{ logs.userID }}
-                </p>
-            </div>
+            <!--<div class="col-sm-2">-->
+                <!--<p class="h6">-->
+                    <!--{{ logs.userID }}-->
+                <!--</p>-->
+            <!--</div>-->
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <p class="h6">
                     {{ logs.errorMessage }}
                 </p>
             </div>
 
-            <div class="col-sm-2">
+            <div class="col-md-2">
                 <p class="h6">
                     {{ logs.recordedTime }}
                 </p>

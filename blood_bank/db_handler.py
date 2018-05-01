@@ -160,7 +160,7 @@ This function will create a new user on the user table, based on userID. if the 
 def user_table_insertion(user_id):
     if not unique_user_check(user_id):
         return -1
-    database_user_id = str(binascii.hexlify(os.urandom(4)))
+    database_user_id = str(binascii.hexlify(os.urandom(14)))
     payload = {
         TAG_USER_TABLE_ID: database_user_id,
         TAG_FB_USERID: user_id,

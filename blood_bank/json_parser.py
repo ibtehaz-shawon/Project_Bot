@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.http import HttpResponse
 
 from blood_bank.db_handler import insert_queue, error_logger, unique_user_check, user_table_insertion
-from blood_bank.message_reply import echo_response
+from blood_bank.message_reply import MessageReply
 
 """
 :argument incoming_message contains the incoming message data from facebook.
@@ -17,158 +17,154 @@ def facebook_message(incoming_message):
             for message in entry['messaging']:
                 if 'message' in message:
                     if 'is_echo' in message['message']:
-                        is_echo(message)
+                        json_parser().is_echo(message)
                         return HttpResponse(status=200)
                     elif 'quick_reply' in message['message']:
-                        quick_reply(message)
+                        json_parser().quick_reply(message)
                         return HttpResponse(status=200)
                     else:
-                        basic_reply(message)
+                        json_parser().basic_reply(message)
                         return HttpResponse(status=200)
                 elif 'delivery' in message:
-                    delivery_result(message)
+                    json_parser().delivery_result(message)
                     return HttpResponse(status=200)
                 elif 'read' in message:
-                    message_read(message)
+                    json_parser().message_read(message)
                     return HttpResponse(status=200)
                 elif 'postback' in message:
-                    postback_response(message)
+                    json_parser().postback_response(message)
                     return HttpResponse(status=200)
                 else:
                     print("Unknown handler box inside entry['messaging']")
-                    unknown_handle(message)
+                    json_parser().unknown_handle(message)
                     return HttpResponse(status=200)
         elif 'standby' in entry:
-            standby(str(entry))
+            json_parser().standby(str(entry))
             return HttpResponse(status=200)
         else:
             print("Unknown totally box")
-            unknown_handle(str(entry))
+            json_parser().unknown_handle(str(entry))
             return HttpResponse(status=200)
     return HttpResponse(status=200)
 
 
-"""
-is_echo function description here
-"""
+##
+class json_parser:
+    """
+    is_echo function description here
+    """
 
-
-def is_echo(message_data):
-    print("Echo Box")
-    return HttpResponse(status=200)
-
-
-"""
-quick_reply function description here
-"""
-
-
-def quick_reply(message_data):
-    print("Quick Reply box")
-    return HttpResponse(status=200)
-
-
-"""
-unknown message request handler
-"""
-
-
-def unknown_handle(message_data):
-    return HttpResponse(status=200)
-
-
-"""
-delivery result handler
-"""
-
-
-def delivery_result(message_data):
-    print("Delivery status")
-    return HttpResponse(status=200)
-
-
-"""
-message read function definition
-"""
-
-
-def message_read(message_data):
-    print("Read box")
-    return HttpResponse(status=200)
-
-
-"""
-postback function definition
-"""
-
-
-def postback_response(message_data):
-    print("Postback box")
-    return HttpResponse(status=200)
-
-
-"""
-standby function definition
-"""
-
-
-def standby(entry):
-    print("Standby box")
-    return HttpResponse(status=200)
-
-
-"""
-process all normal facebook messages from here
-"""
-
-
-# noinspection PyBroadException
-def basic_reply(message_data):
-    print("Basic Reply box")
-    status = False
-    try:
-        insert_queue(message_data)  # insert data to database.
-        user_id = str(message_data['sender']['id'])
-        user_table_insertion(user_id)
-
-        if 'nlp' in message_data['message']:
-            # handle nlp data function from here
-            status = facebook_nlp(message_data)
-
-        if not status:
-            echo_response(user_id, str(message_data['message']['text'].lower()))
-        return HttpResponse(status=200)
-    except ValueError as error:
-        print("Error occurred in basic reply " + str(error))
-        error_logger(str(error), user_id, "basic reply")
-        return HttpResponse(status=200)
-    except BaseException as error:
-        print("Broad exception handling "+str(error))
-        error_logger("Broad exception handling "+str(error), user_id, "basic reply")
+    @classmethod
+    def is_echo(cls, message_data):
+        print("Echo Box")
         return HttpResponse(status=200)
 
+    """
+    quick_reply function description here
+    """
 
-"""
-This function handles facebook's nlp response and if they are successful they take care from here.
-"""
+    @classmethod
+    def quick_reply(cls, message_data):
+        print("Quick Reply box")
+        return HttpResponse(status=200)
 
+    """
+    unknown message request handler
+    """
 
-def facebook_nlp(message_data):
-    return False
+    @classmethod
+    def unknown_handle(cls, message_data):
+        error_logger(str(message_data), None, "JSON_Parser_Class -> Unknown_handle()")
+        return HttpResponse(status=200)
 
+    """
+    delivery result handler
+    """
 
-"""
-new_user_handler
-this table will handle data from echo, quick reply and basic reply and
-check if the user_id is already there.
-Simple function handler.
-"""
+    @classmethod
+    def delivery_result(cls, message_data):
+        # Do nothing function
+        return HttpResponse(status=200)
 
+    """
+    message read function definition
+    """
 
-@DeprecationWarning
-def new_user_handler(user_id):
-    if not unique_user_check(user_id):
-        user_table_insertion(user_id)
-        return True
-    else:
+    @classmethod
+    def message_read(cls, message_data):
+        # Do nothing function
+        return HttpResponse(status=200)
+
+    """
+    postback function definition
+    """
+
+    @classmethod
+    def postback_response(cls, message_data):
+        print("Postback box")
+        return HttpResponse(status=200)
+
+    """
+    standby function definition
+    """
+
+    @classmethod
+    def standby(cls, entry):
+        print("Standby box")
+        return HttpResponse(status=200)
+
+    """
+    process all normal facebook messages from here
+    """
+
+    @classmethod
+    # noinspection PyBroadException
+    def basic_reply(cls, message_data):
+        print("Basic Reply box")
+        status = False
+        user_id = None
+        try:
+            insert_queue(message_data)  # insert data to database.
+            user_id = str(message_data['sender']['id'])
+            user_table_insertion(user_id)
+
+            if 'nlp' in message_data['message']:
+                # handle nlp data function from here
+                status = json_parser().facebook_nlp(message_data)
+
+            if not status:
+                # TODO -> handle echo back reply to do other stuff
+                MessageReply().echo_response(user_id, str(message_data['message']['text'].lower()))
+            return HttpResponse(status=200)
+        except ValueError as error:
+            print("Error occurred in basic reply " + str(error))
+            error_logger(str(error), user_id, "basic reply")
+            return HttpResponse(status=200)
+        except BaseException as error:
+            print("Broad exception handling " + str(error))
+            error_logger("Broad exception handling " + str(error), user_id, "basic reply")
+            return HttpResponse(status=200)
+
+    """
+    This function handles facebook's nlp response and if they are successful they take care from here.
+    """
+
+    @classmethod
+    def facebook_nlp(cls, message_data):
         return False
+
+    """
+    new_user_handler
+    this table will handle data from echo, quick reply and basic reply and
+    check if the user_id is already there.
+    Simple function handler.
+    """
+
+    @classmethod
+    @DeprecationWarning
+    def new_user_handler(cls, user_id):
+        if not unique_user_check(user_id):
+            user_table_insertion(user_id)
+            return True
+        else:
+            return False
