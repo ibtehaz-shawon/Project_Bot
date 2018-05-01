@@ -139,7 +139,8 @@ class Parser:
                 status = Parser().facebook_nlp(message_data)
 
             if not status:
-                MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
+                print ("Status is false, do nothing, ----> !!")
+                # MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
         except ValueError as error:
             print("Error occurred in basic reply " + str(error)+ "\n" + "message data --> "+str(message_data))
