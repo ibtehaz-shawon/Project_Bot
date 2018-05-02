@@ -78,6 +78,7 @@ userID comes from the userTable and is unique. This table has a 1:M relation wit
 
 class ErrorLog(models.Model):
     instanceNumber = models.CharField(max_length=64, primary_key=True, unique=True)
+    errorCounter = models.IntegerField(null=False, default=-1)
     userID = models.ForeignKey(UserTable, on_delete=models.SET_DEFAULT, null=True, default=None)
     errorPlace = models.CharField(max_length=100, null=False, default='dummy!')
     errorMessage = models.CharField(max_length=1000, null=True, default='unknown error!')

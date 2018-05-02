@@ -4,7 +4,7 @@ from time import gmtime, strftime
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from blood_bank.models import UserTable, UserStatus
+from blood_bank.models import UserTable, UserStatus, ErrorLog
 from blood_bank.serializer import DumpMessageSerializer, LoggerSerializer, UserSerializer, StatusSerializer
 from blood_bank.utility import nlp_parser
 from bot.settings import DEBUG
@@ -39,6 +39,7 @@ TAG_BASIC_TYPE = 'basic_reply'
 TAG_QUICK_TYPE = 'quick_reply'
 TAG_NLP_TYPE = 'nlp_reply'
 TAG_ERROR_INSTANCE_NO = 'instanceNumber'
+TAG_ERROR_COUNTER = 'errorCounter'
 
 """
 insert_queue - basically data dumping
@@ -47,7 +48,7 @@ this is vanilla message insertion queue. And It will insert everything
 @:parameter message_data holds the entire JSON Data from messaging parameter
 """
 
-class DB_HANDLER:
+class DB_HANDLER(object):
 
     @classmethod
     def insert_queue(cls, message_data):
@@ -123,9 +124,9 @@ class DB_HANDLER:
     def user_table_insertion(cls, user_id):
         if not DB_HANDLER().unique_user_check(user_id):
             return -2 ## user is old.
-        database_user_id = str(binascii.hexlify(os.urandom(14)))
+        db_id = str(binascii.hexlify(os.urandom(14)))
         payload = {
-            TAG_USER_TABLE_ID: database_user_id,
+            TAG_USER_TABLE_ID: db_id,
             TAG_FB_USERID: user_id,
         }
         serialized_data = UserSerializer(data=payload)
@@ -215,7 +216,7 @@ class DB_HANDLER:
                 error_logger(error_message="request_query came NONE", facebook_id=fb_user_id,
                              error_position="check_user_status - db_handler")
                 return -1
-            else:
+            elif request_query.count() > 0:
                 if request_query[0].freshUser is True:
                     return 100  # user is new. Take all the necessary information needed from the table. User not given
                     # anything yet.
@@ -226,6 +227,9 @@ class DB_HANDLER:
                     else:
                         if request_query[0].informationStatus is True:
                             return 102  # user will be able to donate blood nw. All information complete.
+            else:
+                error_logger("no user status object for " +str(fb_user_id), fb_user_id, "check_user_status")
+                return -2 ## no user status object
 
     """
     create_user_status
@@ -249,10 +253,11 @@ class DB_HANDLER:
                 # Error occurred!
                 error_message = serialized_data.error_messages()
                 print("Error occurred creating new User Status " + str(error_message))
-                error_logger(error_message, fb_user_id, 'create_user_status')
+                error_logger(str(error_message), fb_user_id, 'create_user_status')
                 return -1
         else:
-            return -1
+            error_logger("user id came none from db for "+str(fb_user_id), fb_user_id, "create_user_Status")
+            return -2 ## user id came none
 
     """
     user_status_info
@@ -356,7 +361,12 @@ logs every error in the database
 def error_logger(error_message, facebook_id, error_position, error_code=-1, error_subcode=-1, error_type=-1):
     if DEBUG:
         # This message will only print if the debug is TRUE
-        print("Error occurred >> " + str(error_message) + " | Error pos >> "+str(error_position))
+        print("$$$$$$$ Error occurred : " + str(error_message)
+              + " | Error pos : "+str(error_position)
+              + " | for facebook_id : "+ str(facebook_id) + " $$$$$$$")
+    request_query = ErrorLog.objects.all()
+    error_counter = request_query.count() + 1
+    del request_query
 
     if facebook_id is not None:
         db_user_id = DB_HANDLER().find_actual_user_id(facebook_id)
@@ -371,6 +381,7 @@ def error_logger(error_message, facebook_id, error_position, error_code=-1, erro
 
     payload = {
         TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(30))),
+        TAG_ERROR_COUNTER: error_counter,
         TAG_USER_ID: db_user_id,
         TAG_ERROR_MESSAGE: error_message,
         TAG_ERROR_CODE: error_code,
@@ -383,5 +394,7 @@ def error_logger(error_message, facebook_id, error_position, error_code=-1, erro
         serialized_data.save()
         return 1
     else:
-        print("error logging error! oh crap! " + str(serialized_data.error_messages))
+        if DEBUG:
+            print("$$$$$$$ error logging error! oh crap! "
+                  + str(serialized_data.error_messages) +" $$$$$$$")
         return -1
