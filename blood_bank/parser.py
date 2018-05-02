@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.http import HttpResponse
 
-from blood_bank.db_handler import error_logger, user_table_insertion
+from blood_bank.db_handler import error_logger, DB_HANDLER
 from blood_bank.message_reply import MessageReply
 from bot.settings import DEBUG
 
@@ -126,16 +126,21 @@ class Parser:
     # noinspection PyBroadException
     def basic_reply(cls, message_data):
         print("Basic Reply box")
+        db_handler = DB_HANDLER()
         status = False
         user_id = None
         try:
             # insert_queue(message_data)  # insert data to database.
             user_id = str(message_data['sender']['id'])
-            return_val = user_table_insertion(user_id)
+            return_val = db_handler.user_table_insertion(user_id)
 
             if return_val == -1:
                 # TODO: error occurred in user table insertion checking. might need to kill the script for this user
                 pass
+            else:
+                ### Find the user's current status here.
+                result = db_handler.check_user_status(user_id)
+                print ("Current user id --> "+str(user_id) + " result is --> "+str(result))
 
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
