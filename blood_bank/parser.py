@@ -142,6 +142,12 @@ class Parser:
                 user_status = db_handler.check_user_status(user_id)
                 print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
 
+            if 'text' not in message_data['message']:
+                ## unknown type came like attachment
+                error_logger("text not available --> "+str(message_data),
+                             user_id, "basic_reply")
+                return HttpResponse(status=200)
+
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
                 status = Parser().facebook_nlp(user_id, message_data['message'])

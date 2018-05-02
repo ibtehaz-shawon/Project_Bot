@@ -303,16 +303,16 @@ class DB_HANDLER:
                 request_query = UserStatus.objects.get(userID=user_id)
                 return request_query
             except ObjectDoesNotExist as obj:
-                print("ObjectDoesNotExist occurred in find_actual_user_id " + str(obj))
-                error_logger(str(obj), fb_user_id, 'find_actual_user_id')
+                print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
+                error_logger(str(obj), fb_user_id, 'get_user_status_object')
                 return None
             except AttributeError as attr:
-                print("AttributeError occurred in find_actual_user_id " + str(attr))
-                error_logger(str(attr), fb_user_id, 'find_actual_user_id')
+                print("AttributeError occurred in get_user_status_object " + str(attr))
+                error_logger(str(attr), fb_user_id, 'get_user_status_object')
                 return None
             except TypeError as terr:
-                print("TypeError occurred in find_actual_user_id " + str(terr))
-                error_logger(str(terr), fb_user_id, 'find_actual_user_id')
+                print("TypeError occurred in get_user_status_object " + str(terr))
+                error_logger(str(terr), fb_user_id, 'get_user_status_object')
                 return None
 
     """
