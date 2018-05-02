@@ -338,7 +338,10 @@ class DB_HANDLER(object):
     def get_user_status_object(cls, fb_user_id):
         Utility().print_fucking_stuff ("get_user_status_object")
         try:
-            request_query = UserStatus.objects.filter(facebookUserID=fb_user_id)
+            user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
+            if user_id is None:
+                return None
+            request_query = UserStatus.objects.filter(userID=user_id)
             if request_query.count() > 0:
                 return request_query[0]
             else:
