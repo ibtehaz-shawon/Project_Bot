@@ -198,7 +198,7 @@ class DB_HANDLER(object):
     def find_actual_user_id(cls, fb_user_id):
         try:
             print ("find_actual_user_id "+str(fb_user_id))
-            request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
+            request_query = UserTable.objects.filter(facebookUserID=fb_user_id).first()
             if request_query is None:
                 error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
