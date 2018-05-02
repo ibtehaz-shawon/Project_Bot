@@ -230,36 +230,32 @@ class DB_HANDLER(object):
         :return: Integer (error = -1), success (100, 101, 102)
         """
         try:
-            user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
-            if user_id is None:
-                ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id),
-                                            fb_user_id,"check_user_status - db_handler")
+            # user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
+            # if user_id is None:
+            #     ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id),
+            #                                 fb_user_id,"check_user_status - db_handler")
+            #     return -1
+            # else:
+            request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
+            print("-------->>> " + str(request_query))
+            if request_query is None:
+                ErrorHandler().error_logger("request_query came NONE",
+                                            fb_user_id, "check_user_status - db_handler")
                 return -1
-            else:
-                request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
-                print ("-------->>> "+str(request_query))
-                if request_query is None:
-                    ErrorHandler().error_logger("request_query came NONE",
-                                                fb_user_id, "check_user_status - db_handler")
-                    return -1
-                elif request_query.count() > 0:
-                    if request_query.freshUser is True:
-                        print("fresh user")
-                        return 100  # user is new. Take all the necessary information needed from the table. User not given
-                        # anything yet.
-                    else:
-                        if request_query.getStartedStatus is True and request_query.informationStatus is False:
-                            print("get started")
-                            return 101  # user is not new. Bt There are missing information on the table abt this user. Ask
-                            # those.
-                        else:
-                            if request_query.informationStatus is True:
-                                print("informationStatus")
-                                return 102  # user will be able to donate blood nw. All information complete.
+            else:  ### because database connection has been done in another place.
+                if request_query.freshUser is True:
+                    print("fresh user")
+                    return 100  # user is new. Take all the necessary information needed from the table. User not given
+                    # anything yet.
                 else:
-                    ErrorHandler().error_logger("no user status object for " +str(fb_user_id),
-                                                fb_user_id, "check_user_status")
-                    return -2 ## no user status object
+                    if request_query.getStartedStatus is True and request_query.informationStatus is False:
+                        print("get started")
+                        return 101  # user is not new. Bt There are missing information on the table abt this user. Ask
+                        # those.
+                    else:
+                        if request_query.informationStatus is True:
+                            print("informationStatus")
+                            return 102  # user will be able to donate blood nw. All information complete.
         except ObjectDoesNotExist as obj:
             ErrorHandler().error_logger("exception " + str(obj),
                                         fb_user_id, "check_user_status")
