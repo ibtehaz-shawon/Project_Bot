@@ -4,8 +4,6 @@ import requests
 
 from django.http import HttpResponse
 
-from blood_bank.db_handler import error_logger
-from blood_bank.parser import Parser
 from bot.settings import REPLY_URL
 
 TAG_RECIPIENT = 'recipient'
@@ -27,19 +25,16 @@ class MessageReply:
         :param response: response sring that has to be sent
         :return: void
         """
-        try:
-            Parser.print_fucking_stuff ("Message reply -- > "+str(response))
-            payload = {
-                TAG_RECIPIENT: {
-                    TAG_ID: user_id
-                },
-                TAG_MESSAGE: {
-                    TAG_TEXT: response
-                }
+        print ("Message reply -- > "+str(response))
+        payload = {
+            TAG_RECIPIENT: {
+                TAG_ID: user_id
+            },
+            TAG_MESSAGE: {
+                TAG_TEXT: response
             }
-            status = requests.post(REPLY_URL, json=payload)
-            print("------------------------------")
-            print(status)
-            print("-------------------------------")
-        except BaseException as error:
-            error_logger("Base exception :--> "+str(error), user_id, "echo_response - MessageReply")
+        }
+        status = requests.post(REPLY_URL, json=payload)
+        print("------------------------------")
+        print(status)
+        print("-------------------------------")
