@@ -7,7 +7,7 @@ from django.template import loader
 
 from django.views.decorators.csrf import csrf_exempt
 
-from blood_bank.db_handler import error_logger
+from blood_bank.error_handler import ErrorHandler
 from blood_bank.parser import facebook_message
 from bot.settings import MESSENGER_VERIFY_TOKEN
 
@@ -26,7 +26,7 @@ def index(request):
         if str(request.GET.get('hub.verify_token', 'no_verify_token')) == MESSENGER_VERIFY_TOKEN:
             return HttpResponse(request.GET.get('hub.challenge'))
         else:
-            error_logger("Unknown Request came in GET - Web-hook", None, 'GET - Webhook')
+            ErrorHandler().error_logger("Unknown Request came in GET - Web-hook", None, 'GET - Webhook')
             return HttpResponse(template.render(), status=200)
     elif request.method == 'POST':
         try:
@@ -36,12 +36,12 @@ def index(request):
             return HttpResponse(status=200)
         except ValueError as err:
             print("Error Occurred: " + str(err))
-            error_logger(str(err) + "\n" + str(json.loads(request.body.decode('utf-8'))),
+            ErrorHandler().error_logger(str(err) + "\n" + str(json.loads(request.body.decode('utf-8'))),
                          None, "POST - ValueError - Webhook")
             return HttpResponse(status=200)
         except BaseException as error:
             print("Broad exception handling "+str(error))
-            error_logger(str(error) + "\n" + str(json.loads(request.body.decode('utf-8'))),
+            ErrorHandler().error_logger(str(error) + "\n" + str(json.loads(request.body.decode('utf-8'))),
                          None, "POST - Unknown - Webhook")
             return HttpResponse(status=200)
     else:

@@ -4,7 +4,8 @@ from time import gmtime, strftime
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from blood_bank.models import UserTable, UserStatus, ErrorLogger
+from blood_bank.models import UserTable, UserStatus
+from blood_bank.error_handler import ErrorHandler
 from blood_bank.serializer import DumpMessageSerializer, LoggerSerializer, UserSerializer, StatusSerializer
 from blood_bank.utility import nlp_parser
 from bot.settings import DEBUG
@@ -96,7 +97,7 @@ class DB_HANDLER(object):
             return 1
         else:
             error_message = serialized_data.error_messages()
-            error_logger(error_message, user_id, 'insert_queue')
+            ErrorHandler().error_logger(error_message, user_id, 'insert_queue')
             return -1
 
     """
@@ -117,7 +118,7 @@ class DB_HANDLER(object):
                 print("user id " + str(fb_user_id) + " is [NOT] unique")
                 return False
         except ObjectDoesNotExist as obj:
-            error_logger(str(obj), fb_user_id, 'unique_user_check')
+            ErrorHandler().error_logger(str(obj), fb_user_id, 'unique_user_check')
             return True
 
     """
@@ -146,14 +147,14 @@ class DB_HANDLER(object):
             else:
                 error_message = serialized_data.errors
                 print ("error occurred inside user_table_insertion --> "+str(error_message))
-                error_logger(error_message, fb_user_id, 'user_table_insertion')
+                ErrorHandler().error_logger(error_message, fb_user_id, 'user_table_insertion')
                 return -1 ## error with database insertion.
         except ObjectDoesNotExist as obj:
-            error_logger("Exception :-> " + str(obj)  + " || -- || "+str(error_message)
+            ErrorHandler().error_logger("Exception :-> " + str(obj)  + " || -- || "+str(error_message)
                          , fb_user_id, "user_table_insertion")
             return -2
         except BaseException as bsc:
-            error_logger("Base Exception :-> " + str(bsc) + " || -- || "+str(error_message)
+            ErrorHandler().error_logger("Base Exception :-> " + str(bsc) + " || -- || "+str(error_message)
                          , fb_user_id, "user_table_insertion")
             return -3
 
@@ -181,11 +182,11 @@ class DB_HANDLER(object):
                 request_query.save()
                 return 1
             else:
-                error_logger(error_message='request_query came NONE', facebook_id=user_id,
+                ErrorHandler().error_logger(error_message='request_query came NONE', facebook_id=user_id,
                              error_position='update_user_table')
                 return 0
         else:
-            error_logger(error_message='USER DOES NOT EXIST', facebook_id=user_id,
+            ErrorHandler().error_logger(error_message='USER DOES NOT EXIST', facebook_id=user_id,
                          error_position='update_user_table')
             return -1
 
@@ -200,7 +201,7 @@ class DB_HANDLER(object):
             print ("find_actual_user_id "+str(fb_user_id))
             request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
             if request_query is None:
-                error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
+                ErrorHandler().error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
                 if request_query.count() > 0:
@@ -208,10 +209,10 @@ class DB_HANDLER(object):
                 else:
                     return None
         except ObjectDoesNotExist as obj:
-            error_logger("Exception :-> " + str(obj), fb_user_id, "find_actual_user_id")
+            ErrorHandler().error_logger("Exception :-> " + str(obj), fb_user_id, "find_actual_user_id")
             return None
         except BaseException as bsc:
-            error_logger("Base Exception :-> " + str(bsc), fb_user_id, "find_actual_user_id")
+            ErrorHandler().error_logger("Base Exception :-> " + str(bsc), fb_user_id, "find_actual_user_id")
             return None
 
     """
@@ -231,7 +232,8 @@ class DB_HANDLER(object):
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
 
         if user_id is None:
-            error_logger(error_message="USER_ID is NONE in DB for " + str(fb_user_id), facebook_id=fb_user_id,
+            ErrorHandler().error_logger(error_message="USER_ID is NONE in DB for "
+                                                      + str(fb_user_id), facebook_id=fb_user_id,
                          error_position="check_user_status - db_handler")
             return -1
         else:
@@ -239,7 +241,7 @@ class DB_HANDLER(object):
             print ("check_user_status --> "+str(request_query)
                    + " length is "  + str(len(request_query)))
             if request_query is None:
-                error_logger(error_message="request_query came NONE", facebook_id=fb_user_id,
+                ErrorHandler().error_logger(error_message="request_query came NONE", facebook_id=fb_user_id,
                              error_position="check_user_status - db_handler")
                 return -1
             elif request_query.count() > 0:
@@ -254,7 +256,7 @@ class DB_HANDLER(object):
                         if request_query.informationStatus is True:
                             return 102  # user will be able to donate blood nw. All information complete.
             else:
-                error_logger("no user status object for " +str(fb_user_id), fb_user_id, "check_user_status")
+                ErrorHandler().error_logger("no user status object for " +str(fb_user_id), fb_user_id, "check_user_status")
                 return -2 ## no user status object
 
     """
@@ -282,15 +284,16 @@ class DB_HANDLER(object):
                     # Error occurred!
                     error_message = serialized_data.errors
                     print("Error occurred creating new User Status " + str(error_message))
-                    error_logger(str(error_message), fb_user_id, 'create_user_status')
+                    ErrorHandler().error_logger(str(error_message), fb_user_id, 'create_user_status')
                     return -1
             else:
-                error_logger("user id came none from db for "+str(fb_user_id), fb_user_id, "create_user_Status")
+                ErrorHandler().error_logger("user id came none from db for "
+                                            +str(fb_user_id), fb_user_id, "create_user_Status")
                 return -2 ## user id came none
         except ObjectDoesNotExist as obj:
-            error_logger("Exception :-> " + str(obj), fb_user_id, "create_user_status")
+            ErrorHandler().error_logger("Exception :-> " + str(obj), fb_user_id, "create_user_status")
         except BaseException as bsc:
-            error_logger("BaseException :-> " + str(bsc), fb_user_id, "create_user_status")
+            ErrorHandler().error_logger("BaseException :-> " + str(bsc), fb_user_id, "create_user_status")
 
     """
     user_status_info
@@ -304,7 +307,7 @@ class DB_HANDLER(object):
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
 
         if user_id is None:
-            error_logger(error_message="USER_ID is NONE in DB for " + str(fb_user_id), facebook_id=fb_user_id,
+            ErrorHandler().error_logger(error_message="USER_ID is NONE in DB for " + str(fb_user_id), facebook_id=fb_user_id,
                          error_position="user_status_info - db_handler")
             return -1
         else:
@@ -339,19 +342,19 @@ class DB_HANDLER(object):
                 return request_query[0]
             else:
                 print("Request query is none get_user_status_object "+str(fb_user_id))
-                error_logger("Request query is none", fb_user_id, 'get_user_status_object')
+                ErrorHandler().error_logger("Request query is none", fb_user_id, 'get_user_status_object')
                 return None
         except ObjectDoesNotExist as obj:
             print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
-            error_logger(str(obj), fb_user_id, 'get_user_status_object')
+            ErrorHandler().error_logger(str(obj), fb_user_id, 'get_user_status_object')
             return None
         except AttributeError as attr:
             print("AttributeError occurred in get_user_status_object " + str(attr))
-            error_logger(str(attr), fb_user_id, 'get_user_status_object')
+            ErrorHandler().error_logger(str(attr), fb_user_id, 'get_user_status_object')
             return None
         except TypeError as terr:
             print("TypeError occurred in get_user_status_object " + str(terr))
-            error_logger(str(terr), fb_user_id, 'get_user_status_object')
+            ErrorHandler().error_logger(str(terr), fb_user_id, 'get_user_status_object')
             return None
 
 
@@ -371,64 +374,18 @@ class DB_HANDLER(object):
                 if request_query.count() > 0:
                     return request_query[0]
                 else:
-                    error_logger("request_query came [NONE]", fb_user_id, 'get_user_table_object')
+                    ErrorHandler().error_logger("request_query came [NONE]", fb_user_id, 'get_user_table_object')
                     return None
             else:
-                error_logger("fb_user_id came [NONE]", fb_user_id, 'get_user_table_object')
+                ErrorHandler().error_logger("fb_user_id came [NONE]", fb_user_id, 'get_user_table_object')
                 return None
         except ObjectDoesNotExist as obj:
-            error_logger(str(obj), fb_user_id, 'get_user_table_object')
+            ErrorHandler().error_logger(str(obj), fb_user_id, 'get_user_table_object')
             return None
         except AttributeError as attr:
-            error_logger(str(attr), fb_user_id, 'get_user_table_object')
+            ErrorHandler().error_logger(str(attr), fb_user_id, 'get_user_table_object')
             return None
         except TypeError as terr:
-            error_logger(str(terr), fb_user_id, 'get_user_table_object')
+            ErrorHandler().error_logger(str(terr), fb_user_id, 'get_user_table_object')
             return None
 
-
-"""
-error_logger
-logs every error in the database
-@:parameter error_message, error_code, facebook_user_id, error_subcode, error_type, error_position
-@:returns None
-"""
-
-
-# noinspection SpellCheckingInspection
-def error_logger(error_message, facebook_id, error_position, error_code=-1, error_subcode=-1, error_type=-1):
-    if DEBUG: # This message will only print if the debug is TRUE
-        print("$$$$$$$ Error occurred : " + str(error_message)
-              + " | Error pos : "+str(error_position)
-              + " | for facebook_id : "+ str(facebook_id) + " $$$$$$$")
-
-    request_query = ErrorLogger.objects.all()
-    error_counter = request_query.count() + 1
-    del request_query
-
-    if error_code is None:
-        error_code = -1
-    if error_subcode is None:
-        error_subcode = -1
-    if error_type is None:
-        error_type = -1
-
-    payload = {
-        TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(25))),
-        TAG_ERROR_COUNTER: error_counter,
-        TAG_USER_ID: facebook_id,
-        TAG_ERROR_MESSAGE: error_message,
-        TAG_ERROR_CODE: error_code,
-        TAG_ERROR_SUBCODE: error_subcode,
-        TAG_ERROR_TYPE: error_type,
-        TAG_ERROR_PLACE: error_position
-    }
-    serialized_data = LoggerSerializer(data=payload)
-    if serialized_data.is_valid():
-        serialized_data.save()
-        return 1
-    else:
-        if DEBUG:
-            print("$$$$$$$ error logging error! oh crap! "
-                  + str(serialized_data.error_messages) +" $$$$$$$")
-        return -1

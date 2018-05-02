@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 from django.http import HttpResponse
 
-from blood_bank.db_handler import error_logger, DB_HANDLER
+from blood_bank.db_handler import DB_HANDLER
+from blood_bank.error_handler import ErrorHandler
 from blood_bank.message_reply import MessageReply
 from bot.settings import DEBUG
 
@@ -79,7 +80,7 @@ class Parser:
 
     @classmethod
     def unknown_handle(cls, message_data):
-        error_logger(str(message_data), None, "JSON_Parser_Class -> Unknown_handle()")
+        ErrorHandler().error_logger(str(message_data), None, "JSON_Parser_Class -> Unknown_handle()")
         return HttpResponse(status=200)
 
     """
@@ -145,7 +146,7 @@ class Parser:
 
             if 'text' not in message_data['message']:
                 ## unknown type came like attachment
-                error_logger("text not available --> "+str(message_data),
+                ErrorHandler().error_logger("text not available --> "+str(message_data),
                              user_id, "basic_reply")
                 return HttpResponse(status=200)
 
@@ -159,12 +160,12 @@ class Parser:
         except ValueError as error:
             Parser().print_fucking_stuff("Error occurred in basic reply "
                                          + str(error) + "\n" + "message data --> " + str(message_data))
-            error_logger(str(error), user_id, "basic reply")
+            ErrorHandler().error_logger(str(error), user_id, "basic reply")
             return HttpResponse(status=200)
         except BaseException as error:
             Parser().print_fucking_stuff("Broad exception handling (basic reply) "
                                          + str(error) + "\n" + "message data --> " + str(message_data))
-            error_logger("Broad exception handling " + str(error), user_id, "basic reply")
+            ErrorHandler().error_logger("Broad exception handling " + str(error), user_id, "basic reply")
             return HttpResponse(status=200)
 
     """
@@ -222,10 +223,10 @@ class Parser:
                 pass ## passing on location for now.
         except ValueError as error:
             Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
-            error_logger(str(error), user_id, "facebook_nlp")
+            ErrorHandler().error_logger(str(error), user_id, "facebook_nlp")
         except BaseException as error:
             Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
-            error_logger(str(error), user_id, "facebook_nlp")
+            ErrorHandler().error_logger(str(error), user_id, "facebook_nlp")
         finally:
             if status_bye or status_thank or status_greet:
                 return True
