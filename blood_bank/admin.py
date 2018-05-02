@@ -8,3 +8,4 @@ from .models import UserTable,UserStatus,ErrorLogger,DonationHistory
 admin.site.register(UserTable)
 admin.site.register(UserStatus)
 admin.site.register(DonationHistory)
+admin.site.register(ErrorLogger)
