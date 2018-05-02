@@ -278,7 +278,6 @@ class DB_HANDLER(object):
     """
 
     @classmethod
-    @NotImplemented
     def user_status_info(cls, fb_user_id, user_status_code):
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
 
