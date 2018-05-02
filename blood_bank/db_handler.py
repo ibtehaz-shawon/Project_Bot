@@ -131,7 +131,7 @@ class DB_HANDLER(object):
             print ("user_table_insertion "+str(fb_user_id))
             if not DB_HANDLER().unique_user_check(fb_user_id):
                 return -2 ## user is old.
-            db_id = str(binascii.hexlify(os.urandom(14)))
+            db_id = str(binascii.hexlify(os.urandom(10)))
             print ("user_table_insertion where db id is -- > "+str(db_id))
             payload = {
                 TAG_USER_TABLE_ID: db_id,
