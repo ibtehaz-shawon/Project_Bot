@@ -357,6 +357,9 @@ class DB_HANDLER(object):
             Utility().print_fucking_stuff("TypeError occurred in get_user_status_object " + str(terr))
             ErrorHandler().error_logger(str(terr), fb_user_id, 'get_user_status_object')
             return None
+        except BaseException as berr:
+            Utility().print_fucking_stuff("BaseException "+str(berr))
+            ErrorHandler().error_logger("BaseException "+str(berr), fb_user_id, "get_user_status_object")
 
 
     """
