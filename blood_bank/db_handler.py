@@ -127,36 +127,35 @@ class DB_HANDLER(object):
 
     @classmethod
     def user_table_insertion(cls, fb_user_id):
+        error_message = ""
         try:
-            print ("user_table_insertion "+str(fb_user_id))
             if not DB_HANDLER().unique_user_check(fb_user_id):
                 return -2 ## user is old.
             db_id = str(binascii.hexlify(os.urandom(10)))
-            print ("user_table_insertion where db id is -- > "+str(db_id))
             payload = {
                 TAG_USER_TABLE_ID: db_id,
                 TAG_FB_USERID: fb_user_id,
             }
-            print ("user_table_insertion where payload -- > "+str(payload) + " type is "+str(type(payload)))
-
             serialized_data = UserSerializer(data=payload)
             if serialized_data.is_valid():
                 print ("---------------------------------------------------------------------")
                 serialized_data.save()
                 print (" ----------------- successful user_table_insertion ------------------")
-                # DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
+                DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
                 return 1 ## http 200
             else:
-                error_message = serialized_data.error_messages()
+                error_message = serialized_data.errors
                 print ("error occurred inside user_table_insertion --> "+str(error_message))
                 error_logger(error_message, fb_user_id, 'user_table_insertion')
                 return -1 ## error with database insertion.
         except ObjectDoesNotExist as obj:
-            error_logger("Exception :-> " + str(obj), fb_user_id, "user_table_insertion")
+            error_logger("Exception :-> " + str(obj)  + " || -- || "+str(error_message)
+                         , fb_user_id, "user_table_insertion")
+            return -2
         except BaseException as bsc:
-            print("user table insertion data is NOT valid --> " + str(serialized_data.errors))
-            print("user table insertion data is NOT valid --> " + str(serialized_data.validated_data()))
-            error_logger("Base Exception :-> " + str(bsc), fb_user_id, "user_table_insertion")
+            error_logger("Base Exception :-> " + str(bsc) + " || -- || "+str(error_message)
+                         , fb_user_id, "user_table_insertion")
+            return -3
 
     """
     update_user_table
@@ -279,7 +278,7 @@ class DB_HANDLER(object):
                     return 1
                 else:
                     # Error occurred!
-                    error_message = serialized_data.error_messages()
+                    error_message = serialized_data.errors
                     print("Error occurred creating new User Status " + str(error_message))
                     error_logger(str(error_message), fb_user_id, 'create_user_status')
                     return -1
