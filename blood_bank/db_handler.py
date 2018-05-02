@@ -229,35 +229,44 @@ class DB_HANDLER(object):
         :param fb_user_id:
         :return: Integer (error = -1), success (100, 101, 102)
         """
-        user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
-        if user_id is None:
-            ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id),
-                                        fb_user_id,"check_user_status - db_handler")
-            return -1
-        else:
-            print ("--------------IS IT HERE----------------------------------------")
-            request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
-            Utility().print_fucking_stuff ("check_user_status --> "+str(request_query)
-                   + " length is "  + str(request_query.count()))
-            if request_query is None:
-                ErrorHandler().error_logger("request_query came NONE",
-                                            fb_user_id, "check_user_status - db_handler")
+        try:
+            user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
+            if user_id is None:
+                ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id),
+                                            fb_user_id,"check_user_status - db_handler")
                 return -1
-            elif request_query.count() > 0:
-                if request_query.freshUser is True:
-                    return 100  # user is new. Take all the necessary information needed from the table. User not given
-                    # anything yet.
-                else:
-                    if request_query.getStartedStatus is True and request_query.informationStatus is False:
-                        return 101  # user is not new. Bt There are missing information on the table abt this user. Ask
-                        # those.
-                    else:
-                        if request_query.informationStatus is True:
-                            return 102  # user will be able to donate blood nw. All information complete.
             else:
-                ErrorHandler().error_logger("no user status object for " +str(fb_user_id),
-                                            fb_user_id, "check_user_status")
-                return -2 ## no user status object
+                request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
+                if request_query is None:
+                    ErrorHandler().error_logger("request_query came NONE",
+                                                fb_user_id, "check_user_status - db_handler")
+                    return -1
+                elif request_query.count() > 0:
+                    if request_query.freshUser is True:
+                        print("fresh user")
+                        return 100  # user is new. Take all the necessary information needed from the table. User not given
+                        # anything yet.
+                    else:
+                        if request_query.getStartedStatus is True and request_query.informationStatus is False:
+                            print("get started")
+                            return 101  # user is not new. Bt There are missing information on the table abt this user. Ask
+                            # those.
+                        else:
+                            if request_query.informationStatus is True:
+                                print("informationStatus")
+                                return 102  # user will be able to donate blood nw. All information complete.
+                else:
+                    ErrorHandler().error_logger("no user status object for " +str(fb_user_id),
+                                                fb_user_id, "check_user_status")
+                    return -2 ## no user status object
+        except ObjectDoesNotExist as obj:
+            ErrorHandler().error_logger("exception " + str(obj),
+                                        fb_user_id, "check_user_status")
+            return -3
+        except BaseException as bsc:
+            ErrorHandler().error_logger("base exception " + str(bsc),
+                                        fb_user_id, "check_user_status")
+            return -4
 
     """
     create_user_status
