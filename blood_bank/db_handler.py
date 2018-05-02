@@ -132,6 +132,7 @@ class DB_HANDLER(object):
         serialized_data = UserSerializer(data=payload)
         if serialized_data.is_valid():
             serialized_data.save()
+            print (" ----------------- successful user_table_insertion ------------------")
             DB_HANDLER().create_user_status(fb_user_id=user_id)
             return 1 ## http 200
         else:
@@ -179,14 +180,14 @@ class DB_HANDLER(object):
     @classmethod
     def find_actual_user_id(cls, fb_user_id):
         try:
-            request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
+            request_query = UserTable.objects.filter(facebookUserID=fb_user_id).first()
             if request_query is None:
                 error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
-                return request_query[0].userID
+                return request_query.userID
         except ObjectDoesNotExist as obj:
-            error_logger(str(obj), fb_user_id, "find_actual_user_id")
+            error_logger("Exception :-> " + str(obj), fb_user_id, "find_actual_user_id")
             return None
 
     """
@@ -217,15 +218,15 @@ class DB_HANDLER(object):
                              error_position="check_user_status - db_handler")
                 return -1
             elif request_query.count() > 0:
-                if request_query[0].freshUser is True:
+                if request_query.freshUser is True:
                     return 100  # user is new. Take all the necessary information needed from the table. User not given
                     # anything yet.
                 else:
-                    if request_query[0].getStartedStatus is True and request_query.informationStatus is False:
+                    if request_query.getStartedStatus is True and request_query.informationStatus is False:
                         return 101  # user is not new. Bt There are missing information on the table abt this user. Ask
                         # those.
                     else:
-                        if request_query[0].informationStatus is True:
+                        if request_query.informationStatus is True:
                             return 102  # user will be able to donate blood nw. All information complete.
             else:
                 error_logger("no user status object for " +str(fb_user_id), fb_user_id, "check_user_status")
@@ -306,7 +307,7 @@ class DB_HANDLER(object):
             return None
         else:
             try:
-                request_query = UserStatus.objects.filter(userID=user_id)
+                request_query = UserStatus.objects.filter(userID=user_id).first()
                 return request_query
             except ObjectDoesNotExist as obj:
                 print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
@@ -331,9 +332,8 @@ class DB_HANDLER(object):
     @classmethod
     def get_user_table_object(cls, fb_user_id):
         try:
-            # request_query = UserTable.objects.get(facebookUserID=fb_user_id)
             if fb_user_id is not None:
-                request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
+                request_query = UserTable.objects.filter(facebookUserID=fb_user_id).first()
                 return request_query
             else:
                 error_logger("fb_user_id came [NONE]", fb_user_id, 'get_user_table_object')
@@ -359,11 +359,11 @@ logs every error in the database
 
 # noinspection SpellCheckingInspection
 def error_logger(error_message, facebook_id, error_position, error_code=-1, error_subcode=-1, error_type=-1):
-    if DEBUG:
-        # This message will only print if the debug is TRUE
+    if DEBUG: # This message will only print if the debug is TRUE
         print("$$$$$$$ Error occurred : " + str(error_message)
               + " | Error pos : "+str(error_position)
               + " | for facebook_id : "+ str(facebook_id) + " $$$$$$$")
+
     request_query = ErrorLog.objects.all()
     error_counter = request_query.count() + 1
     del request_query
