@@ -142,6 +142,7 @@ class DB_HANDLER(object):
             return 1 ## http 200
         else:
             error_message = serialized_data.error_messages()
+            print ("error occurred inside user_table_insertion --> "+str(error_message))
             error_logger(error_message, fb_user_id, 'user_table_insertion')
             return -1 ## error with database insertion.
 
@@ -191,7 +192,7 @@ class DB_HANDLER(object):
                 error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
-                print ("request querery counter --?> "+str(request_query.count()))
+                print ("request querery counter --?> "+str(request_query.count()) + " and type "+ type(request_query))
                 if request_query.count() > 0:
                     return request_query[0].userID
                 else:
