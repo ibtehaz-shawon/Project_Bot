@@ -177,13 +177,17 @@ class DB_HANDLER:
 
     @classmethod
     def find_actual_user_id(cls, fb_user_id):
-        request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
-        if request_query is None:
-            print("request_query came NONE")
-            error_logger('request_query came NONE', None, 'find_actual_user_id')
+        try:
+            request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
+            if request_query is None:
+                print("request_query came NONE")
+                error_logger('request_query came NONE', None, 'find_actual_user_id')
+                return None
+            else:
+                return request_query.userID
+        except ObjectDoesNotExist as obj:
+            error_logger(str(obj), fb_user_id, "find_actual_user_id")
             return None
-        else:
-            return request_query.userID
 
     """
     check_user_status
@@ -322,20 +326,21 @@ class DB_HANDLER:
     @classmethod
     def get_user_table_object(cls, fb_user_id):
         try:
-            request_query = UserTable.objects.get(facebookUserID=fb_user_id)
-            return request_query
+            # request_query = UserTable.objects.get(facebookUserID=fb_user_id)
+            if fb_user_id is not None:
+                request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
+                return request_query
+            else:
+                error_logger("fb_user_id came [NONE]", fb_user_id, 'get_user_table_object')
+                return None
         except ObjectDoesNotExist as obj:
-            print("ObjectDoesNotExist occurred in find_actual_user_id " + str(obj))
-            error_logger(str(obj), None, 'get_user_table_object')
+            error_logger(str(obj), fb_user_id, 'get_user_table_object')
             return None
         except AttributeError as attr:
-            print("AttributeError occurred in find_actual_user_id " + str(attr))
-            error_logger(str(attr), None, 'get_user_table_object')
+            error_logger(str(attr), fb_user_id, 'get_user_table_object')
             return None
         except TypeError as terr:
-            print("TypeError occurred in find_actual_user_id " + str(terr))
-            DB_HANDLER().user_table_insertion(100)
-            error_logger(str(terr), None, 'get_user_table_object')
+            error_logger(str(terr), fb_user_id, 'get_user_table_object')
             return None
 
 
