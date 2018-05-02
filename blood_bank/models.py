@@ -34,7 +34,7 @@ mobileVerification process is not fixed. might change later.
 
 
 class UserTable(models.Model):
-    userID = models.CharField(max_length=30, unique=True, primary_key=True)
+    userID = models.CharField(max_length=50, unique=True, primary_key=True)
     facebookUserID = models.CharField(max_length=100, unique=True)
     bloodGroup = models.CharField(max_length=2, null=True, default=None, blank=True)
     mobileNumber = models.CharField(max_length=15, unique=False, null=True, default=-1)

@@ -413,7 +413,7 @@ def error_logger(error_message, facebook_id, error_position, error_code=-1, erro
         error_type = -1
 
     payload = {
-        TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(30))),
+        TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(25))),
         TAG_ERROR_COUNTER: error_counter,
         TAG_USER_ID: facebook_id,
         TAG_ERROR_MESSAGE: error_message,
