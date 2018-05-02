@@ -41,17 +41,20 @@ TAG_NLP_TYPE = 'nlp_reply'
 TAG_ERROR_INSTANCE_NO = 'instanceNumber'
 TAG_ERROR_COUNTER = 'errorCounter'
 
-"""
-insert_queue - basically data dumping
-message insertion queue in the database
-this is vanilla message insertion queue. And It will insert everything 
-@:parameter message_data holds the entire JSON Data from messaging parameter
-"""
 
+"""
+DB_Hanlder class inserts objects inside database.
+"""
 class DB_HANDLER(object):
 
     @classmethod
     def insert_queue(cls, message_data):
+        """
+        insert_queue - basically data dumping
+        message insertion queue in the database
+        this is vanilla message insertion queue. And It will insert everything
+        @:parameter message_data holds the entire JSON Data from messaging parameter
+        """
         message_text = message_data['message']['text']
         user_id = message_data['sender']['id']
         bye_val = 0.00
@@ -102,17 +105,18 @@ class DB_HANDLER(object):
     """
 
     @classmethod
-    def unique_user_check(cls, user_id):
+    def unique_user_check(cls, fb_user_id):
+        print ("unique_user_check "+str(fb_user_id))
         try:
-            request_query = UserTable.objects.filter(facebookUserID=user_id)
+            request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
             if request_query.count() == 0:
-                print("user id " + str(user_id) + " is unique")
+                print("user id " + str(fb_user_id) + " is unique")
                 return True
             else:
-                print("user id " + str(user_id) + " is [NOT] unique")
+                print("user id " + str(fb_user_id) + " is [NOT] unique")
                 return False
         except ObjectDoesNotExist as obj:
-            error_logger(str(obj), user_id, 'unique_user_check')
+            error_logger(str(obj), fb_user_id, 'unique_user_check')
             return True
 
     """
@@ -121,23 +125,24 @@ class DB_HANDLER(object):
     """
 
     @classmethod
-    def user_table_insertion(cls, user_id):
-        if not DB_HANDLER().unique_user_check(user_id):
+    def user_table_insertion(cls, fb_user_id):
+        print ("user_table_insertion "+str(fb_user_id))
+        if not DB_HANDLER().unique_user_check(fb_user_id):
             return -2 ## user is old.
         db_id = str(binascii.hexlify(os.urandom(14)))
         payload = {
             TAG_USER_TABLE_ID: db_id,
-            TAG_FB_USERID: user_id,
+            TAG_FB_USERID: fb_user_id,
         }
         serialized_data = UserSerializer(data=payload)
         if serialized_data.is_valid():
             serialized_data.save()
             print (" ----------------- successful user_table_insertion ------------------")
-            DB_HANDLER().create_user_status(fb_user_id=user_id)
+            DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
             return 1 ## http 200
         else:
             error_message = serialized_data.error_messages()
-            error_logger(error_message, user_id, 'user_table_insertion')
+            error_logger(error_message, fb_user_id, 'user_table_insertion')
             return -1 ## error with database insertion.
 
     """
@@ -180,11 +185,13 @@ class DB_HANDLER(object):
     @classmethod
     def find_actual_user_id(cls, fb_user_id):
         try:
+            print ("find_actual_user_id "+str(fb_user_id))
             request_query = UserTable.objects.filter(facebookUserID=fb_user_id).first()
             if request_query is None:
                 error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
+                print ("request querery counter --?> "+str(request_query.count()))
                 return request_query.userID
         except ObjectDoesNotExist as obj:
             error_logger("Exception :-> " + str(obj), fb_user_id, "find_actual_user_id")
@@ -199,6 +206,7 @@ class DB_HANDLER(object):
 
     @classmethod
     def check_user_status(cls, fb_user_id):
+        print ("check_user_Status")
         """
         :param fb_user_id:
         :return: Integer (error = -1), success (100, 101, 102)
@@ -239,8 +247,10 @@ class DB_HANDLER(object):
 
     @classmethod
     def create_user_status(cls, fb_user_id):
+        print ("create user status")
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
         if user_id is not None:
+            print ("create user status --> user id "+str(user_id) + " when fb_id --> "+str(fb_user_id))
             payload = {
                 TAG_USER_ID: user_id,
                 TAG_FRESH_USER: True,
@@ -268,6 +278,7 @@ class DB_HANDLER(object):
     """
 
     @classmethod
+    @NotImplemented
     def user_status_info(cls, fb_user_id, user_status_code):
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
 
@@ -276,19 +287,20 @@ class DB_HANDLER(object):
                          error_position="user_status_info - db_handler")
             return -1
         else:
-            request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
-
-            if request_query is None:
-                return -1
-            else:
-                if user_status_code == 100:
-                    #  user is fresh. Check the necessary information list from UserTable
-                    return 10
-                elif user_status_code == 101:
-                    return 11
-                elif user_status_code == 102:
-                    return 12
-            return 0
+            request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
+            del request_query
+            return -100 ##TODO not implemented yet
+            # if request_query is None:
+            #     return -1
+            # else:
+            #     if user_status_code == 100:
+            #         #  user is fresh. Check the necessary information list from UserTable
+            #         return 10
+            #     elif user_status_code == 101:
+            #         return 11
+            #     elif user_status_code == 102:
+            #         return 12
+            # return 0
 
     """
     get_user_status_object
@@ -299,28 +311,23 @@ class DB_HANDLER(object):
 
     @classmethod
     def get_user_status_object(cls, fb_user_id):
-        user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
-
-        if user_id is None:
-            error_logger(error_message="USER_ID is NONE in DB for " + str(fb_user_id), facebook_id=fb_user_id,
-                         error_position="check_user_status - db_handler")
+        print ("get_user_status_object")
+        try:
+            request_query = UserStatus.objects.filter(facebookUserID=fb_user_id).first()
+            return request_query
+        except ObjectDoesNotExist as obj:
+            print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
+            error_logger(str(obj), fb_user_id, 'get_user_status_object')
             return None
-        else:
-            try:
-                request_query = UserStatus.objects.filter(userID=user_id).first()
-                return request_query
-            except ObjectDoesNotExist as obj:
-                print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
-                error_logger(str(obj), fb_user_id, 'get_user_status_object')
-                return None
-            except AttributeError as attr:
-                print("AttributeError occurred in get_user_status_object " + str(attr))
-                error_logger(str(attr), fb_user_id, 'get_user_status_object')
-                return None
-            except TypeError as terr:
-                print("TypeError occurred in get_user_status_object " + str(terr))
-                error_logger(str(terr), fb_user_id, 'get_user_status_object')
-                return None
+        except AttributeError as attr:
+            print("AttributeError occurred in get_user_status_object " + str(attr))
+            error_logger(str(attr), fb_user_id, 'get_user_status_object')
+            return None
+        except TypeError as terr:
+            print("TypeError occurred in get_user_status_object " + str(terr))
+            error_logger(str(terr), fb_user_id, 'get_user_status_object')
+            return None
+
 
     """
     get_user_table_object
@@ -331,6 +338,7 @@ class DB_HANDLER(object):
 
     @classmethod
     def get_user_table_object(cls, fb_user_id):
+        print ("get_user_table_object")
         try:
             if fb_user_id is not None:
                 request_query = UserTable.objects.filter(facebookUserID=fb_user_id).first()
