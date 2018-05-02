@@ -140,6 +140,7 @@ class DB_HANDLER(object):
             print ("user_table_insertion where payload -- > "+str(payload))
 
             serialized_data = UserSerializer(data=payload)
+            print ("user table insertion data is valid --> "+str(serialized_data.is_valid()))
             if serialized_data.is_valid():
                 print ("---------------------------------------------------------------------")
                 serialized_data.save()
