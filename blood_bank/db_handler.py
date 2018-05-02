@@ -138,7 +138,7 @@ class DB_HANDLER(object):
         if serialized_data.is_valid():
             serialized_data.save()
             print (" ----------------- successful user_table_insertion ------------------")
-            DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
+            # DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
             return 1 ## http 200
         else:
             error_message = serialized_data.error_messages()
@@ -192,7 +192,7 @@ class DB_HANDLER(object):
                 error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
-                print ("request querery counter --?> "+str(request_query.count()) + " and type "+ type(request_query))
+                print ("request query counter --?> "+str(request_query.count()) + " and type "+ type(request_query))
                 if request_query.count() > 0:
                     return request_query[0].userID
                 else:
@@ -251,28 +251,33 @@ class DB_HANDLER(object):
 
     @classmethod
     def create_user_status(cls, fb_user_id):
-        print ("create user status")
-        user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
-        if user_id is not None:
-            print ("create user status --> user id "+str(user_id) + " when fb_id --> "+str(fb_user_id))
-            payload = {
-                TAG_USER_ID: user_id,
-                TAG_FRESH_USER: True,
-            }
-            serialized_data = StatusSerializer(data=payload)
-            if serialized_data.is_valid():
-                serialized_data.save()
-                print("New User Status Object Created!")
-                return 1
+        try:
+            print ("create user status")
+            user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
+            if user_id is not None:
+                print ("create user status --> user id "+str(user_id) + " when fb_id --> "+str(fb_user_id))
+                payload = {
+                    TAG_USER_ID: user_id,
+                    TAG_FRESH_USER: True,
+                }
+                serialized_data = StatusSerializer(data=payload)
+                if serialized_data.is_valid():
+                    serialized_data.save()
+                    print("New User Status Object Created!")
+                    return 1
+                else:
+                    # Error occurred!
+                    error_message = serialized_data.error_messages()
+                    print("Error occurred creating new User Status " + str(error_message))
+                    error_logger(str(error_message), fb_user_id, 'create_user_status')
+                    return -1
             else:
-                # Error occurred!
-                error_message = serialized_data.error_messages()
-                print("Error occurred creating new User Status " + str(error_message))
-                error_logger(str(error_message), fb_user_id, 'create_user_status')
-                return -1
-        else:
-            error_logger("user id came none from db for "+str(fb_user_id), fb_user_id, "create_user_Status")
-            return -2 ## user id came none
+                error_logger("user id came none from db for "+str(fb_user_id), fb_user_id, "create_user_Status")
+                return -2 ## user id came none
+        except ObjectDoesNotExist as obj:
+            error_logger("Exception :-> " + str(obj), fb_user_id, "create_user_status")
+        except BaseException as bsc:
+            error_logger("BaseException :-> " + str(bsc), fb_user_id, "create_user_status")
 
     """
     user_status_info
