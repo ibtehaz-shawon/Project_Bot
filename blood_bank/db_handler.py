@@ -180,11 +180,10 @@ class DB_HANDLER:
         try:
             request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
             if request_query is None:
-                print("request_query came NONE")
-                error_logger('request_query came NONE', None, 'find_actual_user_id')
+                error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
-                return request_query.userID
+                return request_query[0].userID
         except ObjectDoesNotExist as obj:
             error_logger(str(obj), fb_user_id, "find_actual_user_id")
             return None
