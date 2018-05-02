@@ -198,7 +198,6 @@ class DB_HANDLER:
     @classmethod
     def check_user_status(cls, fb_user_id):
         """
-
         :param fb_user_id:
         :return: Integer (error = -1), success (100, 101, 102)
         """
@@ -210,20 +209,22 @@ class DB_HANDLER:
             return -1
         else:
             request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
+            print ("check_user_status --> "+str(request_query)
+                   + " length is "  + str(len(request_query)))
             if request_query is None:
                 error_logger(error_message="request_query came NONE", facebook_id=fb_user_id,
                              error_position="check_user_status - db_handler")
                 return -1
             else:
-                if request_query.freshUser is True:
+                if request_query[0].freshUser is True:
                     return 100  # user is new. Take all the necessary information needed from the table. User not given
                     # anything yet.
                 else:
-                    if request_query.getStartedStatus is True and request_query.informationStatus is False:
+                    if request_query[0].getStartedStatus is True and request_query.informationStatus is False:
                         return 101  # user is not new. Bt There are missing information on the table abt this user. Ask
                         # those.
                     else:
-                        if request_query.informationStatus is True:
+                        if request_query[0].informationStatus is True:
                             return 102  # user will be able to donate blood nw. All information complete.
 
     """
@@ -300,7 +301,7 @@ class DB_HANDLER:
             return None
         else:
             try:
-                request_query = UserStatus.objects.get(userID=user_id)
+                request_query = UserStatus.objects.filter(userID=user_id)
                 return request_query
             except ObjectDoesNotExist as obj:
                 print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
