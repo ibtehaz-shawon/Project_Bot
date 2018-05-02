@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserTable,UserStatus,ErrorLog,DonationHistory
+from .models import UserTable,UserStatus,ErrorLogger,DonationHistory
 
 
 # Register your models here.
@@ -8,4 +8,3 @@ from .models import UserTable,UserStatus,ErrorLog,DonationHistory
 admin.site.register(UserTable)
 admin.site.register(UserStatus)
 admin.site.register(DonationHistory)
-admin.site.register(ErrorLog)

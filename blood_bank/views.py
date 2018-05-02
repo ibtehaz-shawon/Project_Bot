@@ -3,7 +3,7 @@ from django.http import HttpResponse, Http404
 from django.template import loader
 
 from bot.settings import DEBUG
-from .models import ErrorLog, DataDump
+from .models import ErrorLogger
 
 
 def index(request):
@@ -14,7 +14,7 @@ def index(request):
 def error_log(request):
     if DEBUG:
         template = loader.get_template('blood_bank/logger.html')
-        all_error_logs = ErrorLog.objects.order_by('-recordedTime')[:20]
+        all_error_logs = ErrorLogger.objects.order_by('-recordedTime')[:20]
         ### show the last twenty errors | ignore rest. hyphen implies descending order
         context = {
             'all_error_logs': all_error_logs,

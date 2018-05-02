@@ -4,7 +4,7 @@ from time import gmtime, strftime
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from blood_bank.models import UserTable, UserStatus, ErrorLog
+from blood_bank.models import UserTable, UserStatus, ErrorLogger
 from blood_bank.serializer import DumpMessageSerializer, LoggerSerializer, UserSerializer, StatusSerializer
 from blood_bank.utility import nlp_parser
 from bot.settings import DEBUG
@@ -40,6 +40,7 @@ TAG_QUICK_TYPE = 'quick_reply'
 TAG_NLP_TYPE = 'nlp_reply'
 TAG_ERROR_INSTANCE_NO = 'instanceNumber'
 TAG_ERROR_COUNTER = 'errorCounter'
+TAG_ERROR_USER_ID = 'fb_user_id'
 
 
 """
@@ -126,28 +127,34 @@ class DB_HANDLER(object):
 
     @classmethod
     def user_table_insertion(cls, fb_user_id):
-        print ("user_table_insertion "+str(fb_user_id))
-        if not DB_HANDLER().unique_user_check(fb_user_id):
-            return -2 ## user is old.
-        db_id = str(binascii.hexlify(os.urandom(14)))
-        print ("user_table_insertion where db id is -- > "+str(db_id))
-        payload = {
-            TAG_USER_TABLE_ID: db_id,
-            TAG_FB_USERID: fb_user_id,
-        }
-        print ("user_table_insertion where payload -- > "+str(payload))
+        try:
+            print ("user_table_insertion "+str(fb_user_id))
+            if not DB_HANDLER().unique_user_check(fb_user_id):
+                return -2 ## user is old.
+            db_id = str(binascii.hexlify(os.urandom(14)))
+            print ("user_table_insertion where db id is -- > "+str(db_id))
+            payload = {
+                TAG_USER_TABLE_ID: db_id,
+                TAG_FB_USERID: fb_user_id,
+            }
+            print ("user_table_insertion where payload -- > "+str(payload))
 
-        serialized_data = UserSerializer(data=payload)
-        if serialized_data.is_valid():
-            serialized_data.save()
-            print (" ----------------- successful user_table_insertion ------------------")
-            # DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
-            return 1 ## http 200
-        else:
-            error_message = serialized_data.error_messages()
-            print ("error occurred inside user_table_insertion --> "+str(error_message))
-            error_logger(error_message, fb_user_id, 'user_table_insertion')
-            return -1 ## error with database insertion.
+            serialized_data = UserSerializer(data=payload)
+            if serialized_data.is_valid():
+                print ("---------------------------------------------------------------------")
+                serialized_data.save()
+                print (" ----------------- successful user_table_insertion ------------------")
+                # DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
+                return 1 ## http 200
+            else:
+                error_message = serialized_data.error_messages()
+                print ("error occurred inside user_table_insertion --> "+str(error_message))
+                error_logger(error_message, fb_user_id, 'user_table_insertion')
+                return -1 ## error with database insertion.
+        except ObjectDoesNotExist as obj:
+            error_logger("Exception :-> " + str(obj), fb_user_id, "user_table_insertion")
+        except BaseException as bsc:
+            error_logger("Base Exception :-> " + str(bsc), fb_user_id, "user_table_insertion")
 
     """
     update_user_table
@@ -392,12 +399,10 @@ def error_logger(error_message, facebook_id, error_position, error_code=-1, erro
               + " | Error pos : "+str(error_position)
               + " | for facebook_id : "+ str(facebook_id) + " $$$$$$$")
 
-    request_query = ErrorLog.objects.all()
+    request_query = ErrorLogger.objects.all()
     error_counter = request_query.count() + 1
     del request_query
 
-    if facebook_id is not None:
-        db_user_id = None ## will handle it later.
     if error_code is None:
         error_code = -1
     if error_subcode is None:
@@ -408,7 +413,7 @@ def error_logger(error_message, facebook_id, error_position, error_code=-1, erro
     payload = {
         TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(30))),
         TAG_ERROR_COUNTER: error_counter,
-        TAG_USER_ID: db_user_id,
+        TAG_USER_ID: facebook_id,
         TAG_ERROR_MESSAGE: error_message,
         TAG_ERROR_CODE: error_code,
         TAG_ERROR_SUBCODE: error_subcode,
