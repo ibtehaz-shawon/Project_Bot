@@ -6,9 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from blood_bank.models import UserTable, UserStatus
 from blood_bank.error_handler import ErrorHandler
-from blood_bank.serializer import DumpMessageSerializer, LoggerSerializer, UserSerializer, StatusSerializer
-from blood_bank.utility import nlp_parser
-from bot.settings import DEBUG
+from blood_bank.serializer import DumpMessageSerializer, UserSerializer, StatusSerializer
+from blood_bank.utility import nlp_parser, Utility
 
 TAG_TEXT = 'incomingText'
 TAG_USER_ID = 'userID'
@@ -108,14 +107,14 @@ class DB_HANDLER(object):
 
     @classmethod
     def unique_user_check(cls, fb_user_id):
-        print ("unique_user_check "+str(fb_user_id))
+        Utility().print_fucking_stuff ("unique_user_check "+str(fb_user_id))
         try:
             request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
             if request_query.count() == 0:
-                print("user id " + str(fb_user_id) + " is unique")
+                Utility().print_fucking_stuff("user id " + str(fb_user_id) + " is unique")
                 return True
             else:
-                print("user id " + str(fb_user_id) + " is [NOT] unique")
+                Utility().print_fucking_stuff("user id " + str(fb_user_id) + " is [NOT] unique")
                 return False
         except ObjectDoesNotExist as obj:
             ErrorHandler().error_logger(str(obj), fb_user_id, 'unique_user_check')
@@ -139,14 +138,15 @@ class DB_HANDLER(object):
             }
             serialized_data = UserSerializer(data=payload)
             if serialized_data.is_valid():
-                print ("---------------------------------------------------------------------")
                 serialized_data.save()
-                print (" ----------------- successful user_table_insertion ------------------")
+                Utility().print_fucking_stuff ("-----------------\n"
+                                               "successful user_table_insertion"
+                                               "\n------------------")
                 DB_HANDLER().create_user_status(fb_user_id=fb_user_id)
                 return 1 ## http 200
             else:
                 error_message = serialized_data.errors
-                print ("error occurred inside user_table_insertion --> "+str(error_message))
+                Utility().print_fucking_stuff ("error occurred inside user_table_insertion --> "+str(error_message))
                 ErrorHandler().error_logger(error_message, fb_user_id, 'user_table_insertion')
                 return -1 ## error with database insertion.
         except ObjectDoesNotExist as obj:
@@ -198,7 +198,7 @@ class DB_HANDLER(object):
     @classmethod
     def find_actual_user_id(cls, fb_user_id):
         try:
-            print ("find_actual_user_id "+str(fb_user_id))
+            Utility().print_fucking_stuff ("find_actual_user_id "+str(fb_user_id))
             request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
             if request_query is None:
                 ErrorHandler().error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
@@ -224,7 +224,7 @@ class DB_HANDLER(object):
 
     @classmethod
     def check_user_status(cls, fb_user_id):
-        print ("check_user_Status")
+        Utility().print_fucking_stuff ("check_user_Status")
         """
         :param fb_user_id:
         :return: Integer (error = -1), success (100, 101, 102)
@@ -238,7 +238,7 @@ class DB_HANDLER(object):
             return -1
         else:
             request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
-            print ("check_user_status --> "+str(request_query)
+            Utility().print_fucking_stuff ("check_user_status --> "+str(request_query)
                    + " length is "  + str(len(request_query)))
             if request_query is None:
                 ErrorHandler().error_logger(error_message="request_query came NONE", facebook_id=fb_user_id,
@@ -267,10 +267,11 @@ class DB_HANDLER(object):
     @classmethod
     def create_user_status(cls, fb_user_id):
         try:
-            print ("create user status")
+            Utility().print_fucking_stuff ("create user status")
             user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
             if user_id is not None:
-                print ("create user status --> user id "+str(user_id) + " when fb_id --> "+str(fb_user_id))
+                Utility().print_fucking_stuff ("create user status --> user id "+str(user_id)
+                                               + " when fb_id --> "+str(fb_user_id))
                 payload = {
                     TAG_USER_ID: user_id,
                     TAG_FRESH_USER: True,
@@ -278,12 +279,12 @@ class DB_HANDLER(object):
                 serialized_data = StatusSerializer(data=payload)
                 if serialized_data.is_valid():
                     serialized_data.save()
-                    print("New User Status Object Created!")
+                    Utility().print_fucking_stuff("New User Status Object Created!")
                     return 1
                 else:
                     # Error occurred!
                     error_message = serialized_data.errors
-                    print("Error occurred creating new User Status " + str(error_message))
+                    Utility().print_fucking_stuff("Error occurred creating new User Status " + str(error_message))
                     ErrorHandler().error_logger(str(error_message), fb_user_id, 'create_user_status')
                     return -1
             else:
@@ -307,7 +308,8 @@ class DB_HANDLER(object):
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
 
         if user_id is None:
-            ErrorHandler().error_logger(error_message="USER_ID is NONE in DB for " + str(fb_user_id), facebook_id=fb_user_id,
+            ErrorHandler().error_logger(error_message="USER_ID is NONE in DB for "
+                                                      + str(fb_user_id), facebook_id=fb_user_id,
                          error_position="user_status_info - db_handler")
             return -1
         else:
@@ -335,25 +337,25 @@ class DB_HANDLER(object):
 
     @classmethod
     def get_user_status_object(cls, fb_user_id):
-        print ("get_user_status_object")
+        Utility().print_fucking_stuff ("get_user_status_object")
         try:
             request_query = UserStatus.objects.filter(facebookUserID=fb_user_id)
             if request_query.count() > 0:
                 return request_query[0]
             else:
-                print("Request query is none get_user_status_object "+str(fb_user_id))
+                Utility().print_fucking_stuff("Request query is none get_user_status_object "+str(fb_user_id))
                 ErrorHandler().error_logger("Request query is none", fb_user_id, 'get_user_status_object')
                 return None
         except ObjectDoesNotExist as obj:
-            print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
+            Utility().print_fucking_stuff("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
             ErrorHandler().error_logger(str(obj), fb_user_id, 'get_user_status_object')
             return None
         except AttributeError as attr:
-            print("AttributeError occurred in get_user_status_object " + str(attr))
+            Utility().print_fucking_stuff("AttributeError occurred in get_user_status_object " + str(attr))
             ErrorHandler().error_logger(str(attr), fb_user_id, 'get_user_status_object')
             return None
         except TypeError as terr:
-            print("TypeError occurred in get_user_status_object " + str(terr))
+            Utility().print_fucking_stuff("TypeError occurred in get_user_status_object " + str(terr))
             ErrorHandler().error_logger(str(terr), fb_user_id, 'get_user_status_object')
             return None
 
@@ -367,7 +369,7 @@ class DB_HANDLER(object):
 
     @classmethod
     def get_user_table_object(cls, fb_user_id):
-        print ("get_user_table_object")
+        Utility().print_fucking_stuff ("get_user_table_object")
         try:
             if fb_user_id is not None:
                 request_query = UserTable.objects.filter(facebookUserID=fb_user_id)

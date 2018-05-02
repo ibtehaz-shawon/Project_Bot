@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from blood_bank.db_handler import DB_HANDLER
 from blood_bank.error_handler import ErrorHandler
 from blood_bank.message_reply import MessageReply
+from blood_bank.utility import Utility
 from bot.settings import DEBUG
 
 """
@@ -37,14 +38,14 @@ def facebook_message(incoming_message):
                     Parser().postback_response(message)
                     return HttpResponse(status=200)
                 else:
-                    Parser().print_fucking_stuff("Unknown handler box inside entry['messaging']")
+                    Utility().print_fucking_stuff("Unknown handler box inside entry['messaging']")
                     Parser().unknown_handle(message)
                     return HttpResponse(status=200)
         elif 'standby' in entry:
             Parser().standby(str(entry))
             return HttpResponse(status=200)
         else:
-            Parser().print_fucking_stuff("Unknown totally box")
+            Utility().print_fucking_stuff("Unknown totally box")
             Parser().unknown_handle(str(entry))
             return HttpResponse(status=200)
     return HttpResponse(status=200)
@@ -158,12 +159,12 @@ class Parser:
                 MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
         except ValueError as error:
-            Parser().print_fucking_stuff("Error occurred in basic reply "
+            Utility().print_fucking_stuff("Error occurred in basic reply "
                                          + str(error) + "\n" + "message data --> " + str(message_data))
             ErrorHandler().error_logger(str(error), user_id, "basic reply")
             return HttpResponse(status=200)
         except BaseException as error:
-            Parser().print_fucking_stuff("Broad exception handling (basic reply) "
+            Utility().print_fucking_stuff("Broad exception handling (basic reply) "
                                          + str(error) + "\n" + "message data --> " + str(message_data))
             ErrorHandler().error_logger("Broad exception handling " + str(error), user_id, "basic reply")
             return HttpResponse(status=200)
@@ -222,18 +223,13 @@ class Parser:
             else:
                 pass ## passing on location for now.
         except ValueError as error:
-            Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
+            Utility().print_fucking_stuff(str(error) + " Inside facebook_nlp")
             ErrorHandler().error_logger(str(error), user_id, "facebook_nlp")
         except BaseException as error:
-            Parser().print_fucking_stuff(str(error) + " Inside facebook_nlp")
+            Utility().print_fucking_stuff(str(error) + " Inside facebook_nlp")
             ErrorHandler().error_logger(str(error), user_id, "facebook_nlp")
         finally:
             if status_bye or status_thank or status_greet:
                 return True
             else:
                 return False
-
-    @classmethod
-    def print_fucking_stuff(cls, message):
-        if DEBUG:
-            print(message)
