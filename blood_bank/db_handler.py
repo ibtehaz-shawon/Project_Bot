@@ -235,9 +235,10 @@ class DB_HANDLER(object):
                                         fb_user_id,"check_user_status - db_handler")
             return -1
         else:
+            print ("--------------IS IT HERE----------------------------------------")
             request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
             Utility().print_fucking_stuff ("check_user_status --> "+str(request_query)
-                   + " length is "  + str(len(request_query)))
+                   + " length is "  + str(request_query.count()))
             if request_query is None:
                 ErrorHandler().error_logger("request_query came NONE",
                                             fb_user_id, "check_user_status - db_handler")

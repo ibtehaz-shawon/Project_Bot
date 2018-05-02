@@ -142,7 +142,10 @@ class Parser:
             else: ## all good. returnVal came 1.
                 ### Find the user's current status here.
                 user_status = db_handler.check_user_status(user_id)
-                print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
+                if user_status is not None:
+                    print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
+                else:
+                    print ("user status came null")
 
             if 'text' not in message_data['message']:
                 ## unknown type came like attachment
