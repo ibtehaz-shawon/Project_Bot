@@ -186,13 +186,16 @@ class DB_HANDLER(object):
     def find_actual_user_id(cls, fb_user_id):
         try:
             print ("find_actual_user_id "+str(fb_user_id))
-            request_query = UserTable.objects.filter(facebookUserID=fb_user_id).first()
+            request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
             if request_query is None:
                 error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
                 print ("request querery counter --?> "+str(request_query.count()))
-                return request_query.userID
+                if request_query.count() > 0:
+                    return request_query[0].userID
+                else:
+                    return None
         except ObjectDoesNotExist as obj:
             error_logger("Exception :-> " + str(obj), fb_user_id, "find_actual_user_id")
             return None
@@ -312,8 +315,13 @@ class DB_HANDLER(object):
     def get_user_status_object(cls, fb_user_id):
         print ("get_user_status_object")
         try:
-            request_query = UserStatus.objects.filter(facebookUserID=fb_user_id).first()
-            return request_query
+            request_query = UserStatus.objects.filter(facebookUserID=fb_user_id)
+            if request_query.count() > 0:
+                return request_query[0]
+            else:
+                print("Request query is none get_user_status_object "+str(fb_user_id))
+                error_logger("Request query is none", fb_user_id, 'get_user_status_object')
+                return None
         except ObjectDoesNotExist as obj:
             print("ObjectDoesNotExist occurred in get_user_status_object " + str(obj))
             error_logger(str(obj), fb_user_id, 'get_user_status_object')
@@ -340,8 +348,12 @@ class DB_HANDLER(object):
         print ("get_user_table_object")
         try:
             if fb_user_id is not None:
-                request_query = UserTable.objects.filter(facebookUserID=fb_user_id).first()
-                return request_query
+                request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
+                if request_query.count() > 0:
+                    return request_query[0]
+                else:
+                    error_logger("request_query came [NONE]", fb_user_id, 'get_user_table_object')
+                    return None
             else:
                 error_logger("fb_user_id came [NONE]", fb_user_id, 'get_user_table_object')
                 return None
