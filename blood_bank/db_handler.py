@@ -203,8 +203,7 @@ class DB_HANDLER(object):
                 error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
             else:
-                print ("request query counter --?> "+str(request_query.count())
-                       + " and type "+ str(type(request_query)))
+                print ("request query counter --?> "+str(request_query.count()) + " and type "+ type(request_query))
                 if request_query.count() > 0:
                     return request_query[0].userID
                 else:
