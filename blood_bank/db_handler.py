@@ -122,7 +122,7 @@ class DB_HANDLER:
     @classmethod
     def user_table_insertion(cls, user_id):
         if not DB_HANDLER().unique_user_check(user_id):
-            return -1
+            return -2 ## user is old.
         database_user_id = str(binascii.hexlify(os.urandom(14)))
         payload = {
             TAG_USER_TABLE_ID: database_user_id,
@@ -132,11 +132,11 @@ class DB_HANDLER:
         if serialized_data.is_valid():
             serialized_data.save()
             DB_HANDLER().create_user_status(fb_user_id=user_id)
-            return 1
+            return 1 ## http 200
         else:
             error_message = serialized_data.error_messages()
             error_logger(error_message, user_id, 'user_table_insertion')
-            return -1
+            return -1 ## error with database insertion.
 
     """
     update_user_table

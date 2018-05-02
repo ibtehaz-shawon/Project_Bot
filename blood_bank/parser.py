@@ -135,12 +135,12 @@ class Parser:
             return_val = db_handler.user_table_insertion(user_id)
 
             if return_val == -1:
-                # TODO: error occurred in user table insertion checking. might need to kill the script for this user
-                pass
-            else:
+                # An error occurred during user table insertion. System exit.
+                return HttpResponse(status=200)
+            else: ## all good. returnVal came 1.
                 ### Find the user's current status here.
-                result = db_handler.check_user_status(user_id)
-                print ("Current user id --> "+str(user_id) + " result is --> "+str(result))
+                user_status = db_handler.check_user_status(user_id)
+                print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
 
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
