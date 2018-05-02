@@ -130,10 +130,13 @@ class DB_HANDLER(object):
         if not DB_HANDLER().unique_user_check(fb_user_id):
             return -2 ## user is old.
         db_id = str(binascii.hexlify(os.urandom(14)))
+        print ("user_table_insertion where db id is -- > "+str(db_id))
         payload = {
             TAG_USER_TABLE_ID: db_id,
             TAG_FB_USERID: fb_user_id,
         }
+        print ("user_table_insertion where payload -- > "+str(payload))
+
         serialized_data = UserSerializer(data=payload)
         if serialized_data.is_valid():
             serialized_data.save()
@@ -394,9 +397,7 @@ def error_logger(error_message, facebook_id, error_position, error_code=-1, erro
     del request_query
 
     if facebook_id is not None:
-        db_user_id = DB_HANDLER().find_actual_user_id(facebook_id)
-    else:
-        db_user_id = None
+        db_user_id = None ## will handle it later.
     if error_code is None:
         error_code = -1
     if error_subcode is None:
