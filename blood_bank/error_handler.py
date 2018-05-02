@@ -4,6 +4,7 @@ import os
 
 from blood_bank.models import ErrorLogger
 from blood_bank.serializer import LoggerSerializer
+from blood_bank.utility import Utility
 from bot.settings import DEBUG
 
 
@@ -28,8 +29,7 @@ class ErrorHandler:
     @classmethod
     # noinspection SpellCheckingInspection
     def error_logger(cls, error_message, facebook_id, error_position, error_code=-1, error_subcode=-1, error_type=-1):
-        if DEBUG:  # This message will only print if the debug is TRUE
-            print("$$$$$$$ Error occurred : " + str(error_message)
+        Utility.print_fucking_stuff("$$$$$$$ Error occurred : " + str(error_message)
                   + " | Error pos : " + str(error_position)
                   + " | for facebook_id : " + str(facebook_id) + " $$$$$$$")
 
@@ -59,7 +59,6 @@ class ErrorHandler:
             serialized_data.save()
             return 1
         else:
-            if DEBUG:
-                print("$$$$$$$ error logging error! oh crap! "
-                      + str(serialized_data.error_messages) + " $$$$$$$")
+            Utility().print_fucking_stuff("$$$$$$$ error logging error! oh crap! "
+                                          + str(serialized_data.error_messages) + " $$$$$$$")
             return -1

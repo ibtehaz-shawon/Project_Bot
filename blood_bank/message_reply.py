@@ -2,8 +2,7 @@ from __future__ import unicode_literals
 
 import requests
 
-from django.http import HttpResponse
-
+from blood_bank.utility import Utility
 from bot.settings import REPLY_URL
 
 TAG_RECIPIENT = 'recipient'
@@ -25,7 +24,7 @@ class MessageReply:
         :param response: response sring that has to be sent
         :return: void
         """
-        print ("Message reply -- > "+str(response))
+        Utility().print_fucking_stuff ("Message reply -- > "+str(response))
         payload = {
             TAG_RECIPIENT: {
                 TAG_ID: user_id
@@ -35,6 +34,6 @@ class MessageReply:
             }
         }
         status = requests.post(REPLY_URL, json=payload)
-        print("------------------------------")
-        print(status)
-        print("-------------------------------")
+        Utility().print_fucking_stuff("------------------------------\n"
+                                      + str(status)
+                                      +"\n-------------------------------")

@@ -141,9 +141,8 @@ class Parser:
                 return HttpResponse(status=200)
             else: ## all good. returnVal came 1.
                 ### Find the user's current status here.
-                # user_status = db_handler.check_user_status(user_id)
-                # print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
-                print ("inside else")
+                user_status = db_handler.check_user_status(user_id)
+                print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
 
             if 'text' not in message_data['message']:
                 ## unknown type came like attachment

@@ -230,19 +230,17 @@ class DB_HANDLER(object):
         :return: Integer (error = -1), success (100, 101, 102)
         """
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
-
         if user_id is None:
-            ErrorHandler().error_logger(error_message="USER_ID is NONE in DB for "
-                                                      + str(fb_user_id), facebook_id=fb_user_id,
-                         error_position="check_user_status - db_handler")
+            ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id),
+                                        fb_user_id,"check_user_status - db_handler")
             return -1
         else:
             request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
             Utility().print_fucking_stuff ("check_user_status --> "+str(request_query)
                    + " length is "  + str(len(request_query)))
             if request_query is None:
-                ErrorHandler().error_logger(error_message="request_query came NONE", facebook_id=fb_user_id,
-                             error_position="check_user_status - db_handler")
+                ErrorHandler().error_logger("request_query came NONE",
+                                            fb_user_id, "check_user_status - db_handler")
                 return -1
             elif request_query.count() > 0:
                 if request_query.freshUser is True:
@@ -256,7 +254,8 @@ class DB_HANDLER(object):
                         if request_query.informationStatus is True:
                             return 102  # user will be able to donate blood nw. All information complete.
             else:
-                ErrorHandler().error_logger("no user status object for " +str(fb_user_id), fb_user_id, "check_user_status")
+                ErrorHandler().error_logger("no user status object for " +str(fb_user_id),
+                                            fb_user_id, "check_user_status")
                 return -2 ## no user status object
 
     """
