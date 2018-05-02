@@ -137,10 +137,11 @@ class DB_HANDLER(object):
                 TAG_USER_TABLE_ID: db_id,
                 TAG_FB_USERID: fb_user_id,
             }
-            print ("user_table_insertion where payload -- > "+str(payload))
+            print ("user_table_insertion where payload -- > "+str(payload) + " type is "+str(type(payload)))
 
             serialized_data = UserSerializer(data=payload)
-            print ("user table insertion data is valid --> "+str(serialized_data.is_valid()))
+            print ("user table insertion data is NOT valid --> "+str(serialized_data.errors()))
+            print ("user table insertion data is NOT valid --> "+str(serialized_data.validated_data()))
             if serialized_data.is_valid():
                 print ("---------------------------------------------------------------------")
                 serialized_data.save()
