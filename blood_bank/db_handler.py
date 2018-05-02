@@ -140,8 +140,6 @@ class DB_HANDLER(object):
             print ("user_table_insertion where payload -- > "+str(payload) + " type is "+str(type(payload)))
 
             serialized_data = UserSerializer(data=payload)
-            print ("user table insertion data is NOT valid --> "+str(serialized_data.errors))
-            print ("user table insertion data is NOT valid --> "+str(serialized_data.validated_data()))
             if serialized_data.is_valid():
                 print ("---------------------------------------------------------------------")
                 serialized_data.save()
@@ -156,6 +154,8 @@ class DB_HANDLER(object):
         except ObjectDoesNotExist as obj:
             error_logger("Exception :-> " + str(obj), fb_user_id, "user_table_insertion")
         except BaseException as bsc:
+            print("user table insertion data is NOT valid --> " + str(serialized_data.errors))
+            print("user table insertion data is NOT valid --> " + str(serialized_data.validated_data()))
             error_logger("Base Exception :-> " + str(bsc), fb_user_id, "user_table_insertion")
 
     """
