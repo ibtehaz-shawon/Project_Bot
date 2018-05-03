@@ -143,9 +143,14 @@ class Parser:
                 ### Find the user's current status here.
                 user_status = db_handler.check_user_status(user_id)
                 if user_status is not None:
+                    if user_status == 100:
+                        MessageReply.quick_reply_text(user_id, "Pluk Plak",
+                                                      ["hello one", "hello two"], Utility.get_postback_keys_fresh())
+                        return HttpResponse(status=200)
                     print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
                 else:
                     print ("user status came null")
+                    # TODO -> need some fcking error handling here
 
             if 'text' not in message_data['message']:
                 ## unknown type came like attachment

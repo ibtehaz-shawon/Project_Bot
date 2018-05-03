@@ -262,7 +262,7 @@ class DB_HANDLER(object):
     create_user_status
     this function will automatically creates a new entry for each new user, in UserTable in UserStatus table.
     """
-    
+
     @classmethod
     def create_user_status(cls, fb_user_id):
         try:

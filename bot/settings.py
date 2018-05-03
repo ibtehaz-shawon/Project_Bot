@@ -18,16 +18,10 @@ from bot.db_config import db_postgres_url_parsing
 # from django.conf.global_settings import DATABASES
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('App_Secret_Key')
-
 # Facebook messenger bot PAGE_ACCESS_TOKEN code
 PAGE_ACCESS_TOKEN = config('PAGE_ACCESS_TOKEN')
-
+# Messenger verification token - check ENV
 MESSENGER_VERIFY_TOKEN = config('MESSENGER_VERIFY_TOKEN')
 
 FACEBOOK_GRAPH_URL = 'https://graph.facebook.com/v2.6/me/messages?access_token='
@@ -35,7 +29,6 @@ REPLY_URL = FACEBOOK_GRAPH_URL + str(PAGE_ACCESS_TOKEN)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
