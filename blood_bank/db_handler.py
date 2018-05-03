@@ -230,14 +230,7 @@ class DB_HANDLER(object):
         :return: Integer (error = -1), success (100, 101, 102)
         """
         try:
-            # user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
-            # if user_id is None:
-            #     ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id),
-            #                                 fb_user_id,"check_user_status - db_handler")
-            #     return -1
-            # else:
             request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
-            print("-------->>> " + str(request_query))
             if request_query is None:
                 ErrorHandler().error_logger("request_query came NONE",
                                             fb_user_id, "check_user_status - db_handler")
@@ -269,7 +262,7 @@ class DB_HANDLER(object):
     create_user_status
     this function will automatically creates a new entry for each new user, in UserTable in UserStatus table.
     """
-
+    
     @classmethod
     def create_user_status(cls, fb_user_id):
         try:
