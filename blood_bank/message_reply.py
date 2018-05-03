@@ -128,7 +128,7 @@ class MessageReply:
                 Utility().print_fucking_stuff("------------------------------\n"
                                               + str(status)
                                               + "\n-------------------------------")
-                time.sleep(3)
+                time.sleep(1.5)
                 return 0
             else:
                 ErrorHandler().error_logger("status code " + str(status.status_code) + " , payload is "
