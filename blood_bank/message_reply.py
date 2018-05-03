@@ -31,7 +31,7 @@ class MessageReply:
         :return: void
         """
         try:
-            Utility().print_fucking_stuff ("Message reply -- > "+str(response))
+            Utility().print_fucking_stuff ("echo_response()-- > "+str(response))
             payload = {
                 TAG_RECIPIENT: {
                     TAG_ID: user_id

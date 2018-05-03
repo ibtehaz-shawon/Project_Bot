@@ -131,6 +131,7 @@ class Parser:
         db_handler = DB_HANDLER()
         status = False
         user_id = None
+        user_status = 0
         try:
             # insert_queue(message_data)  # insert data to database.
             user_id = str(message_data['sender']['id'])
@@ -142,15 +143,11 @@ class Parser:
             else: ## all good. returnVal came 1.
                 ### Find the user's current status here.
                 user_status = db_handler.check_user_status(user_id)
-                if user_status is not None:
-                    if user_status == 100:
-                        MessageReply.quick_reply_text(user_id, "Pluk Plak",
-                                                      ["hello one", "hello two"], Utility.get_postback_keys_fresh())
-                        return HttpResponse(status=200)
-                    print ("Current user id --> "+str(user_id) + " result is --> "+str(user_status))
-                else:
-                    print ("user status came null")
-                    # TODO -> need some fcking error handling here
+                if user_status is None:
+                    Utility.print_fucking_stuff ("user status came null")
+                    ErrorHandler.error_logger("user status is none, closing service!",
+                                              user_id, "basic_reply_if user_status is None:")
+                    return HttpResponse(status=200)
 
             if 'text' not in message_data['message']:
                 ## unknown type came like attachment
@@ -162,6 +159,20 @@ class Parser:
                 # handle nlp data function from here
                 status = Parser().facebook_nlp(user_id, message_data['message'])
 
+            if user_status is not None:
+                if user_status == 100:
+                    MessageReply.quick_reply_text(user_id, Utility.__INTRO_MESSAGE_QUICK_REPLY_FRESH__,
+                                                  [Utility.__INTRO_OPTION_DONOR_QUICK_REPLY_FRESH__,
+                                                   Utility.__INTRO_OPTION_PATIENT_QUICK_REPLY_FRESH__],
+                                                  Utility.get_postback_keys_fresh())
+                    return HttpResponse(status=200)
+                print("Current user id --> " + str(user_id) + " result is --> " + str(user_status))
+
+            # TODO --------------------------------------------------------------
+            # TODO --------------------------------------------------------------
+            # TODO -> this echo back reply is not necessary on future references.
+            # TODO --------------------------------------------------------------
+            # TODO --------------------------------------------------------------
             if not status:
                 MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
