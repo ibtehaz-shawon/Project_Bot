@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import requests
+import time
 
 from blood_bank.error_handler import ErrorHandler
 from blood_bank.utility import Utility
@@ -15,6 +16,8 @@ TAG_CONTENT_TYPE_TEXT = 'content_type'
 TAG_TITLE = 'title'
 TAG_PAYLOAD = 'payload'
 TAG_IMAGE_URL = 'image_url'
+TAG_SENDER_ACTION = 'sender_action'
+TAG_TYPING_ON = 'typing_on'
 
 """
 Message Response class
@@ -22,6 +25,7 @@ Message Response class
 
 
 class MessageReply:
+
     @classmethod
     def echo_response(cls, user_id, response):
         """
@@ -32,6 +36,11 @@ class MessageReply:
         """
         try:
             Utility().print_fucking_stuff ("echo_response()-- > "+str(response))
+            if MessageReply().__typing_on(user_id) != 0:
+                ## On success, it will return 0.
+                Utility().print_fucking_stuff("An error occurred inside __typing_on!")
+                return
+
             payload = {
                 TAG_RECIPIENT: {
                     TAG_ID: user_id
@@ -65,12 +74,16 @@ class MessageReply:
         """
         try:
             Utility().print_fucking_stuff("quick_reply_text -- > " + str(response_text))
+            if MessageReply().__typing_on(user_id) != 0:
+                ## On success, it will return 0.
+                Utility().print_fucking_stuff("An error occurred inside __typing_on!")
+                return
             quick_replies = []
             for i in range(0, 2):
                 payload = {TAG_CONTENT_TYPE_TEXT: 'text', TAG_TITLE: choices[i], TAG_PAYLOAD: postbacks[i]}
                 quick_replies.append(payload)
 
-            response_payload = MessageReply().create_basic_recipient(user_id)
+            response_payload = MessageReply().__create_basic_recipient(user_id)
             message = {TAG_TEXT: str(response_text), TAG_QUICK_REPLIES: quick_replies}
             response_payload[TAG_MESSAGE] = message
 
@@ -88,7 +101,7 @@ class MessageReply:
             ErrorHandler().error_logger("Base exception : " + str(error), user_id, "quick_reply_text - Message Reply")
 
     @classmethod
-    def create_basic_recipient(cls, user_id):
+    def __create_basic_recipient(cls, user_id):
         """
 
         :param user_id:
@@ -99,6 +112,29 @@ class MessageReply:
         return payload
 
 
-# if __name__ == "__main__":
-#     print ("harry potter")
-#     MessageReply().quick_reply_text("12212", "Hello World", ['1', '222'], ["kdfkdsf", "jdifjsdlifsdf"])
+    @classmethod
+    def __typing_on(cls, user_id):
+        """
+        private function, turns on typing function, sleep 3s before doing anything else.
+        :param user_id:
+        :return:
+        """
+        try:
+            payload = MessageReply().__create_basic_recipient(user_id)
+            payload[TAG_SENDER_ACTION] = TAG_TYPING_ON
+            status = requests.post(REPLY_URL, json=payload)
+
+            if status.status_code == 200:
+                Utility().print_fucking_stuff("------------------------------\n"
+                                              + str(status)
+                                              + "\n-------------------------------")
+                time.sleep(3)
+                return 0
+            else:
+                ErrorHandler().error_logger("status code " + str(status.status_code) + " , payload is "
+                                                                                       "" + str(payload),
+                                            user_id, "echo_response - Message Reply")
+                return -1
+        except BaseException as error:
+            ErrorHandler().error_logger("Base exception : " + str(error), user_id, "typing_on - Message Reply")
+            return -1
