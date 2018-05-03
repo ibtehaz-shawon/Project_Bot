@@ -71,7 +71,7 @@ class MessageReply:
                 quick_replies.append(payload)
 
             response_payload = MessageReply().create_basic_recipient(user_id)
-            message = {TAG_MESSAGE: str(response_text), TAG_QUICK_REPLIES: quick_replies}
+            message = {TAG_TEXT: str(response_text), TAG_QUICK_REPLIES: quick_replies}
             response_payload[TAG_MESSAGE] = message
 
             status = requests.post(REPLY_URL, json=response_payload)
@@ -83,7 +83,7 @@ class MessageReply:
             else:
                 ErrorHandler().error_logger("status code " + str(status.status_code) + " , payload is "
                                                                                        "" + str(response_payload),
-                                            user_id, "echo_response - Message Reply")
+                                            user_id, "quick_reply_text - Message Reply")
         except BaseException as error:
             ErrorHandler().error_logger("Base exception : " + str(error), user_id, "quick_reply_text - Message Reply")
 
