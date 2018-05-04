@@ -129,7 +129,7 @@ class Parser:
     def basic_reply(cls, message_data):
         print("Basic Reply box")
         db_handler = DB_HANDLER()
-        status = False
+        status = [False, 0]
         user_id = None
         user_status = 0
         try:
@@ -160,7 +160,7 @@ class Parser:
                 status = Parser().facebook_nlp(user_id, message_data['message'])
 
             if user_status is not None:
-                if user_status == 100:
+                if user_status == 100 and status[1] == 100:
                     MessageReply.quick_reply_text(user_id, Utility.__INTRO_MESSAGE_QUICK_REPLY_FRESH__,
                                                   [Utility.__INTRO_OPTION_DONOR_QUICK_REPLY_FRESH__,
                                                    Utility.__INTRO_OPTION_PATIENT_QUICK_REPLY_FRESH__],
@@ -173,7 +173,7 @@ class Parser:
             # TODO -> this echo back reply is not necessary on future references.
             # TODO --------------------------------------------------------------
             # TODO --------------------------------------------------------------
-            if not status:
+            if not status[0]:
                 MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
         except ValueError as error:
@@ -201,6 +201,7 @@ class Parser:
         """
         print("Facebook's NLP box")
         status_bye = status_greet = status_thank = status_loc = False
+        payload = [False, 0]
         message_reply = MessageReply()
         try:
             if 'bye' in message_data["nlp"]['entities']:
@@ -228,16 +229,22 @@ class Parser:
                     status_bye = True
                     ## Bye will cut all running processing for this user for a while.
                     message_reply.echo_response(user_id, "Bye :)")
+                    payload[0] = status_bye
+                    payload[1] = 101
             elif thanks_val > bye_val and  thanks_val > greetings_val and thanks_val > location_val:
                 if thanks_val >= 0.85:
                     status_thank = True
                     ## Thanks will do nothing.
                     message_reply.echo_response(user_id, "Thanks :)")
+                    payload[0] = status_thank
+                    payload[1] = 102
             elif greetings_val > bye_val and greetings_val > thanks_val and greetings_val > location_val:
                 if greetings_val >= 0.85:
                     status_greet = True
                     ##TODO: Start work here.
                     message_reply.echo_response(user_id, "Hello :)")
+                    payload[0] = status_greet
+                    payload[1] = 100
             else:
                 pass ## passing on location for now.
         except ValueError as error:
