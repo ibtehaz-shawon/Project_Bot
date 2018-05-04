@@ -19,7 +19,7 @@ class Utility:
     __INTRO_MESSAGE_QUICK_REPLY_FRESH__ = "I see you're new in this services! I am a friendly messenger chat bot"
     __INTRO_OPTION_DONOR_QUICK_REPLY_FRESH__ = "Want to donate <3"
     __INTRO_OPTION_PATIENT_QUICK_REPLY_FRESH__ = "Need emergency blood"
-    __GENERIC_ERROR_MESSAGE__ = "I'm sorry an error occurred while processing your request! :("
+    __GENERIC_ERROR_MESSAGE__ = "I'm sorry. An error occurred while processing your request! :("
 
     @classmethod
     def print_fucking_stuff(cls, message):

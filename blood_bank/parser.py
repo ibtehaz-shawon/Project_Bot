@@ -129,9 +129,7 @@ class Parser:
     def basic_reply(cls, message_data):
         print("Basic Reply box")
         db_handler = DB_HANDLER()
-        status = [False, 0]
         user_id = None
-        user_status = 0
         try:
             # insert_queue(message_data)  # insert data to database.
             user_id = str(message_data['sender']['id'])
@@ -158,6 +156,8 @@ class Parser:
             if 'nlp' in message_data['message']:
                 # handle nlp data function from here
                 status = Parser().facebook_nlp(user_id, message_data['message'])
+            else:
+                status = [False, 0]
 
             if user_status is not None:
                 if user_status == 100 and status[1] == 100:
@@ -254,7 +254,4 @@ class Parser:
             Utility().print_fucking_stuff(str(error) + " Inside facebook_nlp")
             ErrorHandler().error_logger(str(error), user_id, "facebook_nlp")
         finally:
-            if status_bye or status_thank or status_greet:
-                return True
-            else:
-                return False
+            return payload
