@@ -33,14 +33,13 @@ mobileVerification process is not fixed. might change later.
 """
 
 
-class UserTable(models.Model):
+class UserInformation(models.Model):
     userID = models.CharField(max_length=50, unique=True, primary_key=True)
     facebookUserID = models.CharField(max_length=100, unique=True)
     bloodGroup = models.CharField(max_length=2, null=True, default=None, blank=True)
     mobileNumber = models.CharField(max_length=15, unique=False, null=True, default=-1)
     mobileVerified = models.BooleanField(default=False)
-    homeCity = models.CharField(max_length=50, null=True, default=-1)
-    currentCity = models.CharField(max_length=50, null=True, default=-1)
+    location = models.CharField(max_length=100, null=True, default=None)
 
 
 """
@@ -50,7 +49,7 @@ userID comes from the userTable and is unique. This table has a 1:M relation wit
 
 
 class DonationHistory(models.Model):
-    userID = models.ForeignKey(UserTable, on_delete=models.CASCADE)
+    userID = models.ForeignKey(UserInformation, on_delete=models.CASCADE)
     donatedOn = models.CharField(max_length=30, null=True, default=-1)
 
 
@@ -62,7 +61,7 @@ other statuses are basically boolean. This table might change later.
 
 
 class UserStatus(models.Model):
-    userID = models.ForeignKey(UserTable, on_delete=models.CASCADE)
+    userID = models.ForeignKey(UserInformation, on_delete=models.CASCADE)
     freshUser = models.BooleanField(default=True)
     getStartedStatus = models.BooleanField(default=False, blank=True)
     donationStatus = models.BooleanField(default=False, blank=True)

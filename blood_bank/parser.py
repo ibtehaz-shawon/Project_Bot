@@ -292,6 +292,17 @@ class Parser:
         ## find missing information
         ## ask those.
         Utility.print_fucking_stuff("QUICK_REPLY_DONATE "+str(user_id))
+
+        message_reply = MessageReply
+        db_handler = DB_HANDLER
+
+        message_reply.echo_response(user_id, "Great :)")
+        user_status = db_handler.check_user_status(user_id)
+        if user_status < 0:
+            return HttpResponse(status=200)
+
+        ## find the missing information
+
         return None
 
     """

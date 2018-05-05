@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DataDump, UserTable, DonationHistory, ErrorLogger, UserStatus
+from .models import DataDump, UserInformation, DonationHistory, ErrorLogger, UserStatus
 
 
 class DumpMessageSerializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class DumpMessageSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserTable
+        model = UserInformation
         fields = '__all__'
 
 

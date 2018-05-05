@@ -4,7 +4,7 @@ from time import gmtime, strftime
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from blood_bank.models import UserTable, UserStatus
+from blood_bank.models import UserInformation, UserStatus
 from blood_bank.error_handler import ErrorHandler
 from blood_bank.serializer import DumpMessageSerializer, UserSerializer, StatusSerializer
 from blood_bank.utility import nlp_parser, Utility
@@ -109,7 +109,7 @@ class DB_HANDLER(object):
     def unique_user_check(cls, fb_user_id):
         Utility().print_fucking_stuff ("unique_user_check "+str(fb_user_id))
         try:
-            request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
+            request_query = UserInformation.objects.filter(facebookUserID=fb_user_id)
             if request_query.count() == 0:
                 Utility().print_fucking_stuff("user id " + str(fb_user_id) + " is unique")
                 return True
@@ -203,7 +203,7 @@ class DB_HANDLER(object):
     def find_actual_user_id(cls, fb_user_id):
         try:
             Utility().print_fucking_stuff ("find_actual_user_id "+str(fb_user_id))
-            request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
+            request_query = UserInformation.objects.filter(facebookUserID=fb_user_id)
             if request_query is None:
                 ErrorHandler().error_logger('request_query came NONE', fb_user_id, 'find_actual_user_id')
                 return None
@@ -300,36 +300,26 @@ class DB_HANDLER(object):
             ErrorHandler().error_logger("BaseException :-> " + str(bsc), fb_user_id, "create_user_status")
 
     """
-    user_status_info
+    user_status_info (starting with 2 information blood group and location.)
     Checks user's status from UserTable and UserStatus Table. sends the information required to complete users information
-    @:param fb_user_id, user_status_code
-    @:return
+    @:param fb_user_id
+    @:return [100 -> 
     """
-
     @classmethod
-    def user_status_info(cls, fb_user_id, user_status_code):
+    def check_user_information(cls, fb_user_id):
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
 
         if user_id is None:
-            ErrorHandler().error_logger(error_message="USER_ID is NONE in DB for "
-                                                      + str(fb_user_id), facebook_id=fb_user_id,
-                         error_position="user_status_info - db_handler")
+            ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id)
+                                        ,fb_user_id,"user_status_info - db_handler")
             return -1
         else:
-            request_query = DB_HANDLER().get_user_status_object(fb_user_id=fb_user_id)
-            del request_query
-            return -100 ##TODO not implemented yet
-            # if request_query is None:
-            #     return -1
-            # else:
-            #     if user_status_code == 100:
-            #         #  user is fresh. Check the necessary information list from UserTable
-            #         return 10
-            #     elif user_status_code == 101:
-            #         return 11
-            #     elif user_status_code == 102:
-            #         return 12
-            # return 0
+            request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
+            if request_query.bloodGroup is None:
+                return 100
+            if request_query.location == -1:
+                return 101
+        return None
 
     """
     get_user_status_object
@@ -381,7 +371,7 @@ class DB_HANDLER(object):
         Utility().print_fucking_stuff ("get_user_table_object")
         try:
             if fb_user_id is not None:
-                request_query = UserTable.objects.filter(facebookUserID=fb_user_id)
+                request_query = UserInformation.objects.filter(facebookUserID=fb_user_id)
                 if request_query.count() > 0:
                     return request_query[0]
                 else:
