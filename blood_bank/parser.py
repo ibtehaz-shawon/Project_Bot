@@ -72,7 +72,7 @@ class Parser:
 
     @classmethod
     def quick_reply(cls, message_data):
-        print("Quick Reply box")
+        print("Quick Reply box "+str(message_data))
         return HttpResponse(status=200)
 
     """
@@ -255,3 +255,18 @@ class Parser:
             ErrorHandler().error_logger(str(error), user_id, "facebook_nlp")
         finally:
             return payload
+
+
+    """
+    This handles all the necessary information required for create donate identity.
+    """
+    @classmethod
+    def quick_reply_donate(cls, user_id, response):
+        return
+
+    """
+    This handles all the necessary information regarding emergency blood needed!
+    """
+    @classmethod
+    def quick_reply_emergency_blood(cls, user_id, response):
+        return
