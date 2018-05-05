@@ -308,18 +308,24 @@ class DB_HANDLER(object):
     @classmethod
     def check_user_information(cls, fb_user_id):
         user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
-
-        if user_id is None:
-            ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id)
-                                        ,fb_user_id,"user_status_info - db_handler")
-            return -1
-        else:
-            request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
-            if request_query.bloodGroup is None:
-                return 100
-            if request_query.location == -1:
-                return 101
-        return None
+        try:
+            if user_id is None:
+                ErrorHandler().error_logger("USER_ID is NONE in DB for " + str(fb_user_id)
+                                            ,fb_user_id,"user_status_info - db_handler")
+                return -1
+            else:
+                request_query = DB_HANDLER().get_user_table_object(fb_user_id=fb_user_id)
+                if request_query.bloodGroup is None:
+                    return 100
+                if request_query.location is None:
+                    return 101
+                return 200 ## All good.
+        except ObjectDoesNotExist as error:
+            ErrorHandler.error_logger("Object Not found error "+str(error), fb_user_id, "check_user_information")
+            return None
+        except BaseException as error:
+            ErrorHandler.error_logger("Base Exception "+str(error), fb_user_id, "check_user_information")
+            return None
 
     """
     get_user_status_object

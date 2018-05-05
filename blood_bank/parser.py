@@ -200,6 +200,7 @@ class Parser:
             # TODO --------------------------------------------------------------
             # TODO --------------------------------------------------------------
             if not status[0]:
+                ## Parse message for location, blood group and emergency blood needed from here
                 MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
         except ValueError as error:
@@ -300,9 +301,17 @@ class Parser:
         user_status = db_handler.check_user_status(user_id)
         if user_status < 0:
             return HttpResponse(status=200)
+        del user_status
+        ## user is either fresh or have some missing information.
+        missing_information_status = db_handler.check_user_information(user_id)
 
         ## find the missing information
-
+        if missing_information_status == 100:
+            #missing blood group
+            MessageReply.echo_response(user_id, "Blood group")
+        if missing_information_status == 101:
+            #missing location. GET THEM
+            MessageReply.echo_response(user_id, "LOCOLOCO")
         return None
 
     """
