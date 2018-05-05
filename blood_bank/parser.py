@@ -6,7 +6,6 @@ from blood_bank.db_handler import DB_HANDLER
 from blood_bank.error_handler import ErrorHandler
 from blood_bank.message_reply import MessageReply
 from blood_bank.utility import Utility
-from bot.settings import DEBUG
 
 """
 :argument incoming_message contains the incoming message data from facebook.
@@ -75,7 +74,7 @@ class Parser:
         Utility.print_fucking_stuff("Quick Reply box "+str(message_data))
         db_hanlder = DB_HANDLER()
         try:
-            user_id = Parser.__parse_user_id(str(message_data))
+            user_id = Parser.__parse_user_id(message_data)
             if user_id is None:
                 Utility.print_fucking_stuff("USER_ID came NONE. Parsing Error occurred! Parser.QUICK_REPLY")
                 return HttpResponse(status=200)
@@ -134,7 +133,7 @@ class Parser:
 
     @classmethod
     def postback_response(cls, message_data):
-        print("Postback box")
+        Utility.print_fucking_stuff("Postback box")
         return HttpResponse(status=200)
 
     """
@@ -143,7 +142,7 @@ class Parser:
 
     @classmethod
     def standby(cls, entry):
-        print("Standby box")
+        Utility.print_fucking_stuff("Standby box")
         return HttpResponse(status=200)
 
     """
@@ -153,7 +152,7 @@ class Parser:
     @classmethod
     # noinspection PyBroadException
     def basic_reply(cls, message_data):
-        print("Basic Reply box")
+        Utility.print_fucking_stuff("Basic Reply box")
         db_handler = DB_HANDLER()
         user_id = None
         try:
@@ -226,7 +225,7 @@ class Parser:
         :param message_data: nlp message data.
         :return: boolean
         """
-        print("Facebook's NLP box")
+        Utility.print_fucking_stuff("Facebook's NLP box")
         status_bye = status_greet = status_thank = status_loc = False
         payload = [False, 0]
         message_reply = MessageReply()
