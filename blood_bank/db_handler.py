@@ -322,10 +322,10 @@ class DB_HANDLER(object):
                 return 200 ## All good.
         except ObjectDoesNotExist as error:
             ErrorHandler.error_logger("Object Not found error "+str(error), fb_user_id, "check_user_information")
-            return None
+            return -2
         except BaseException as error:
             ErrorHandler.error_logger("Base Exception "+str(error), fb_user_id, "check_user_information")
-            return None
+            return -3
 
     """
     get_user_status_object

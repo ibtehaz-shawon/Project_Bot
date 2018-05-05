@@ -297,7 +297,7 @@ class Parser:
         message_reply = MessageReply
         db_handler = DB_HANDLER
 
-        message_reply.echo_response(user_id, "Great :)")
+        message_reply.echo_response(user_id, "Great :) Lets get started!")
         user_status = db_handler.check_user_status(user_id)
         if user_status < 0:
             return HttpResponse(status=200)
@@ -305,13 +305,20 @@ class Parser:
         ## user is either fresh or have some missing information.
         missing_information_status = db_handler.check_user_information(user_id)
 
+        if missing_information_status < 0:
+            # error occurred there and it has already been reported.
+            return None
         ## find the missing information
         if missing_information_status == 100:
             #missing blood group
-            MessageReply.echo_response(user_id, "Blood group")
-        if missing_information_status == 101:
+            MessageReply.echo_response(user_id, "I'll need to register your blood group."
+                                                " Can you tell me what is your blood group?")
+        elif missing_information_status == 101:
             #missing location. GET THEM
-            MessageReply.echo_response(user_id, "LOCOLOCO")
+            MessageReply.echo_response(user_id, "Register Location later.")
+        elif missing_information_status == 200:
+            ## TODO : all information complete. Do stuff here.
+            Utility.print_fucking_stuff("All information completto")
         return None
 
     """
@@ -319,7 +326,8 @@ class Parser:
     """
     @classmethod
     def quick_reply_emergency_blood(cls, user_id):
-        return
+        MessageReply.echo_response(user_id, "quick_reply_emergency_blood")
+        return None
 
     """
     This friendly method parses the user id off the JSON.
@@ -339,3 +347,11 @@ class Parser:
                                       + " || Response text ::: " + str(response_text),
                                       None, "__parse_user_id")
             return None
+
+
+    """
+    Will parse through message for keywords that has not gone through OK with facebook NLP
+    """
+    @classmethod
+    def __regex(cls, user_id, original_message_text):
+        return None
