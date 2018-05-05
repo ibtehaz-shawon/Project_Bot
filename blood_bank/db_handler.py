@@ -103,8 +103,8 @@ class DB_HANDLER(object):
     unique_user_check
     This function will check and return boolean whether user_id is unique in the table or not.
     user_id is facebook user id on the table -> UserTable
+    :return bool
     """
-
     @classmethod
     def unique_user_check(cls, fb_user_id):
         Utility().print_fucking_stuff ("unique_user_check "+str(fb_user_id))
@@ -123,14 +123,18 @@ class DB_HANDLER(object):
     """
     user_table_insertion
     This function will create a new user on the user table, based on userID. if the user is new.
+    1 user is new (success
+    2 user is old (success)
+    -1 error
+    -3 error
+    -4 error
     """
-
     @classmethod
     def user_table_insertion(cls, fb_user_id):
         error_message = ""
         try:
             if not DB_HANDLER().unique_user_check(fb_user_id):
-                return -2 ## user is old.
+                return 2 ## user is old.
             db_id = str(binascii.hexlify(os.urandom(10)))
             payload = {
                 TAG_USER_TABLE_ID: db_id,
@@ -152,11 +156,11 @@ class DB_HANDLER(object):
         except ObjectDoesNotExist as obj:
             ErrorHandler().error_logger("Exception :-> " + str(obj)  + " || -- || "+str(error_message)
                          , fb_user_id, "user_table_insertion")
-            return -2
+            return -3
         except BaseException as bsc:
             ErrorHandler().error_logger("Base Exception :-> " + str(bsc) + " || -- || "+str(error_message)
                          , fb_user_id, "user_table_insertion")
-            return -3
+            return -4
 
     """
     update_user_table

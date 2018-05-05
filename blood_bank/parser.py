@@ -63,7 +63,7 @@ class Parser:
 
     @classmethod
     def is_echo(cls, message_data):
-        print("Echo Box")
+        Utility.print_fucking_stuff("Echo Box")
         return HttpResponse(status=200)
 
     """
@@ -72,8 +72,34 @@ class Parser:
 
     @classmethod
     def quick_reply(cls, message_data):
-        print("Quick Reply box "+str(message_data))
-        return HttpResponse(status=200)
+        Utility.print_fucking_stuff("Quick Reply box "+str(message_data))
+        db_hanlder = DB_HANDLER()
+        try:
+            user_id = Parser.__parse_user_id(str(message_data))
+            if user_id is None:
+                Utility.print_fucking_stuff("USER_ID came NONE. Parsing Error occurred! Parser.QUICK_REPLY")
+                return HttpResponse(status=200)
+
+            if db_hanlder.unique_user_check(user_id):
+                return_val = db_hanlder.user_table_insertion(user_id)
+                Utility.print_fucking_stuff("return_value user table insertion "+str(return_val))
+
+            if 'payload' in message_data['message']['quick_reply']:
+                status = Utility.check_quick_reply_keys(str(message_data['message']['quick_reply']['payload']))
+                if status == 1:
+                    # donor
+                    Parser.quick_reply_donate(user_id)
+                elif status == 2:
+                    ## emergency
+                    Parser.quick_reply_emergency_blood(user_id)
+
+            ## NOTHING TO Parse anymore.
+        except ValueError as error:
+            ErrorHandler.error_logger("Error: "+str(error), user_id, "quick_reply")
+        except BaseException as error:
+            ErrorHandler.error_logger("Base exception Error: "+str(error), user_id, "quick_reply")
+        finally:
+            return HttpResponse(status=200)
 
     """
     unknown message request handler
@@ -135,10 +161,11 @@ class Parser:
             user_id = str(message_data['sender']['id'])
             return_val = db_handler.user_table_insertion(user_id)
 
-            if return_val == -1:
+            if return_val < 0:
                 # An error occurred during user table insertion. System exit.
                 return HttpResponse(status=200)
-            else: ## all good. returnVal came 1.
+            else:
+                ## all good. returnVal came 1.
                 ### Find the user's current status here.
                 user_status = db_handler.check_user_status(user_id)
                 if user_status is None:
@@ -261,12 +288,34 @@ class Parser:
     This handles all the necessary information required for create donate identity.
     """
     @classmethod
-    def quick_reply_donate(cls, user_id, response):
+    def quick_reply_donate(cls, user_id):
+        ## check user status and unique user first
+        ## find missing information
+        ## ask those.
         return
 
     """
     This handles all the necessary information regarding emergency blood needed!
     """
     @classmethod
-    def quick_reply_emergency_blood(cls, user_id, response):
+    def quick_reply_emergency_blood(cls, user_id):
         return
+
+    """
+    This friendly method parses the user id off the JSON.
+    """
+    @classmethod
+    def __parse_user_id(cls, response_text):
+        Utility.print_fucking_stuff("__parse_user_id")
+        try:
+            return str(response_text['sender']['id'])
+        except ValueError as error:
+            ErrorHandler.error_logger("Error ::: "+str(error)
+                                      + " || Response text ::: "+str(response_text),
+                                      None, "__parse_user_id")
+            return None
+        except BaseException as error:
+            ErrorHandler.error_logger("Base Exception ::: " + str(error)
+                                      + " || Response text ::: " + str(response_text),
+                                      None, "__parse_user_id")
+            return None

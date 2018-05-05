@@ -38,3 +38,23 @@ class Utility:
         :return:
         """
         return [config('REPLY_KEY_FRESH_DONOR'),config('REPLY_KEY_FRESH_PATIENT')]
+
+
+    """
+    check the payload keys for quick reply
+    1 -> QUICK_REPLY_DONOR
+    2 -> NEED EMERGENCY DONATION
+    """
+    @staticmethod
+    def check_quick_reply_keys(payload):
+        ## TODO: these function needs a better implemnetation
+        ## TODO: I am flying blind
+        stored_keys = Utility.get_postback_keys_fresh()
+
+        if str(payload) == str(stored_keys[0]):
+            return 1
+        elif str(payload) == str(stored_keys[1]):
+            return 2
+        else:
+            return 0
+
