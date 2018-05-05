@@ -292,7 +292,8 @@ class Parser:
         ## check user status and unique user first
         ## find missing information
         ## ask those.
-        return
+        Utility.print_fucking_stuff("QUICK_REPLY_DONATE "+str(user_id))
+        return None
 
     """
     This handles all the necessary information regarding emergency blood needed!
