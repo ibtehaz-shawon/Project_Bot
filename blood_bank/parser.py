@@ -201,7 +201,7 @@ class Parser:
             # TODO -> this echo back reply is not necessary on future references.
             # TODO --------------------------------------------------------------
             # TODO --------------------------------------------------------------
-            status = Parser().__temporary_conditioning(user_id, str(message_data['message']['text']).upper())
+            Parser().__temporary_conditioning(user_id, str(message_data['message']['text']).upper())
             ## status object might be important. Its a list.
             if not status[0]:
                 ## Parse message for location, blood group and emergency blood needed from here
