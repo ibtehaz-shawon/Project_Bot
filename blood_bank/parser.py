@@ -7,6 +7,8 @@ from blood_bank.error_handler import ErrorHandler
 from blood_bank.message_reply import MessageReply
 from blood_bank.utility import Utility
 
+import re
+
 """
 :argument incoming_message contains the incoming message data from facebook.
 this function sends the parsing request to appropriate function
@@ -199,6 +201,7 @@ class Parser:
             # TODO -> this echo back reply is not necessary on future references.
             # TODO --------------------------------------------------------------
             # TODO --------------------------------------------------------------
+            status = Parser().__temporary_conditioning(user_id, str(message_data['message']['text']).upper())
             if not status[0]:
                 ## Parse message for location, blood group and emergency blood needed from here
                 MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
@@ -227,7 +230,6 @@ class Parser:
         :return: boolean
         """
         Utility.print_fucking_stuff("Facebook's NLP box")
-        status_bye = status_greet = status_thank = status_loc = False
         payload = [False, 0]
         message_reply = MessageReply()
         try:
@@ -253,24 +255,20 @@ class Parser:
 
             if bye_val > thanks_val and bye_val > greetings_val and bye_val > location_val:
                 if bye_val >= 0.85:
-                    status_bye = True
                     ## Bye will cut all running processing for this user for a while.
                     message_reply.echo_response(user_id, "Bye :)")
-                    payload[0] = status_bye
+                    payload[0] = True
                     payload[1] = 101
             elif thanks_val > bye_val and  thanks_val > greetings_val and thanks_val > location_val:
                 if thanks_val >= 0.85:
-                    status_thank = True
                     ## Thanks will do nothing.
                     message_reply.echo_response(user_id, "Thanks :)")
-                    payload[0] = status_thank
+                    payload[0] = True
                     payload[1] = 102
             elif greetings_val > bye_val and greetings_val > thanks_val and greetings_val > location_val:
                 if greetings_val >= 0.85:
-                    status_greet = True
-                    ##TODO: Start work here.
                     message_reply.echo_response(user_id, "Hello :)")
-                    payload[0] = status_greet
+                    payload[0] = True
                     payload[1] = 100
             else:
                 pass ## passing on location for now.
@@ -354,4 +352,29 @@ class Parser:
     """
     @classmethod
     def __regex(cls, user_id, original_message_text):
+        regex_blood = re.compile(r'blo*d+', re.I)
+        regex_group = re.compile(r'gro*u*p+', re.I)
+        regex_group_name = re.compile(r"AB""|A""|B""|O", re.I)
+
+        r_big = re.compile(r'blo*d+' 'gro*u*p+' 'AB''|A''|B''|O', re.I)
+
+        split_text = original_message_text.split(" ")
+        regex_value = []
         return None
+
+
+    @classmethod
+    def __temporary_conditioning(cls, user_id, message_text):
+        if user_id is None or message_text is None:
+            ErrorHandler.error_logger("blood group or location, none value", user_id,
+                                      "__temporary_conditioning")
+        blood_group = ['AB+', 'AB-', 'A+', 'A-', 'B+', 'B-', 'O+', 'O-']
+        message_text = message_text.split(" ")
+
+        for words in message_text:
+            if words in blood_group:
+                Utility.print_fucking_stuff("User id "+str(user_id) + " and blood group "+str(words))
+                # TODO -> work here. blood group and location.
+                MessageReply.echo_response(user_id, "Blood group: "+str(words))
+                return True
+        return False
