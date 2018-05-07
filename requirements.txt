@@ -6,9 +6,11 @@ djangorestframework==3.8.2
 gunicorn==19.7.1
 idna==2.6
 Markdown==2.6.11
+nltk==3.3
 psycopg2-binary==2.7.4
 python-decouple==3.1
 pytz==2018.4
 requests==2.18.4
+six==1.11.0
 urllib3==1.22
 whitenoise==3.3.1
