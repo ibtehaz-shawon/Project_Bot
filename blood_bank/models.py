@@ -95,11 +95,6 @@ class FlowController(models.Model):
     previousRequest = models.CharField(max_length=20, null=False, blank=False)
     expirationDate = models.DateTimeField("Request Expiration Date")
 
-    def save(self):
-        from datetime import datetime, timedelta
-        # TODO: This delta time needs to customize based on requirement later
-        delta = timedelta(days=1)
-
-        if not self.userID:
-            self.expirationDate = datetime.now() + delta
-            super(FlowController, self).save()
+# from datetime import datetime, timedelta
+#         # TODO: This delta time needs to customize based on requirement later
+#         delta = timedelta(days=1)

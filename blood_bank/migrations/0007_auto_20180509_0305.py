@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('blood_bank', '0006_auto_20180509_0258'),
     ]
-
     operations = [
         migrations.AlterField(
             model_name='flowcontroller',
