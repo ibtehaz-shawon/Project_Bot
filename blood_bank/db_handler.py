@@ -4,10 +4,11 @@ from time import gmtime, strftime
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from blood_bank.models import UserInformation, UserStatus
+from blood_bank.custom_codes import ReturnCodes
 from blood_bank.error_handler import ErrorHandler
-from blood_bank.serializer import DumpMessageSerializer, UserSerializer, StatusSerializer
+from blood_bank.serializer import *
 from blood_bank.utility import nlp_parser, Utility
+
 
 TAG_TEXT = 'incomingText'
 TAG_USER_ID = 'userID'
@@ -41,6 +42,8 @@ TAG_NLP_TYPE = 'nlp_reply'
 TAG_ERROR_INSTANCE_NO = 'instanceNumber'
 TAG_ERROR_COUNTER = 'errorCounter'
 TAG_ERROR_USER_ID = 'fb_user_id'
+TAG_REQUEST_IDENTIFIER = 'requestIdentifier'
+TAG_EXPIRATION_DATE = 'expirationDate'
 
 
 """
@@ -396,3 +399,64 @@ class DB_HANDLER(object):
             ErrorHandler().error_logger(str(terr), fb_user_id, 'get_user_table_object')
             return None
 
+
+    """
+    flow_controller_insert
+    this class generates instances of flow controller for ease of conversation tracking between each user.
+    :param: fb_user_id :str, 
+    :param: request_identifier : str
+    :param: days : integer
+    :return Integer (@see ReturnCodes)
+    """
+
+    @classmethod
+    def flow_controller_insert(cls, fb_user_id, request_identifier, days = 1):
+        Utility.print_fucking_stuff("flow controller insertion")
+        try:
+            if fb_user_id is None:
+                ErrorHandler().error_logger("fb user id is [NONE]", fb_user_id, "flow_controller_insert",
+                                            error_code=ReturnCodes.ErrorNoneValue)
+                return ReturnCodes.ErrorNoneValue
+
+            user_id = DB_HANDLER().find_actual_user_id(fb_user_id)
+            if user_id is not None:
+                Utility().print_fucking_stuff("create convo flow object --> user id " + str(user_id)
+                                              + " when fb_id --> " + str(fb_user_id))
+
+                from datetime import datetime, timedelta
+                delta = timedelta(days=days)
+                expiration_date = datetime.now() + delta
+                payload = {
+                    TAG_USER_ID: user_id,
+                    TAG_REQUEST_IDENTIFIER: str(request_identifier),
+                    TAG_EXPIRATION_DATE: expiration_date,
+                }
+                serialized_data = FlowSerializer(data=payload)
+                if serialized_data.is_valid():
+                    serialized_data.save()
+                    Utility().print_fucking_stuff("New controller generated!")
+                    return ReturnCodes.SuccessGeneric
+                else:
+                    # Error occurred!
+                    error_message = serialized_data.errors
+                    Utility().print_fucking_stuff("Error occurred creating new flow controller " + str(error_message))
+                    ErrorHandler().error_logger(str(error_message), fb_user_id, 'flow_controller_insert',
+                                                error_code=ReturnCodes.ErrorDBSerialization)
+                    return ReturnCodes.ErrorDBSerialization
+            else:
+                ErrorHandler().error_logger("user id came none from db for "
+                                            + str(fb_user_id), fb_user_id, "flow_controller_insert",
+                                            error_code=ReturnCodes.ErrorNoneValue)
+                return ReturnCodes.ErrorNoneValue ## user id came none
+        except ObjectDoesNotExist as obj:
+            ErrorHandler().error_logger(str(obj), fb_user_id, 'flow_controller_insert',
+                                        error_code=ReturnCodes.ErrorObjectDoesNotExist)
+            return ReturnCodes.ErrorObjectDoesNotExist
+        except AttributeError as attr:
+            ErrorHandler().error_logger(str(attr), fb_user_id, 'flow_controller_insert',
+                                        error_code=ReturnCodes.ErrorAttributeError)
+            return ReturnCodes.ErrorAttributeError
+        except TypeError as terr:
+            ErrorHandler().error_logger(str(terr), fb_user_id, 'flow_controller_insert',
+                                        error_code=ReturnCodes.ErrorTypeError)
+            return ReturnCodes.ErrorTypeError

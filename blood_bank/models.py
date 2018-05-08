@@ -92,9 +92,6 @@ Handles the data flow issue during the conversation.
 """
 class FlowController(models.Model):
     userID = models.ForeignKey(UserInformation, on_delete=models.CASCADE)
-    previousRequest = models.CharField(max_length=20, null=False, blank=False)
+    requestIdentifier = models.CharField(max_length=20, null=False, blank=False)
     expirationDate = models.DateTimeField("Request Expiration Date")
 
-# from datetime import datetime, timedelta
-#         # TODO: This delta time needs to customize based on requirement later
-#         delta = timedelta(days=1)

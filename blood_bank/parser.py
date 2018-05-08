@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.http import HttpResponse
 
+from blood_bank.custom_codes import ConversationCodes
 from blood_bank.db_handler import DB_HANDLER
 from blood_bank.error_handler import ErrorHandler
 from blood_bank.message_reply import MessageReply
@@ -75,6 +76,7 @@ class Parser:
     def quick_reply(cls, message_data):
         Utility.print_fucking_stuff("Quick Reply box "+str(message_data))
         db_hanlder = DB_HANDLER()
+        user_id = None
         try:
             user_id = Parser.__parse_user_id(message_data)
             if user_id is None:
@@ -377,5 +379,6 @@ class Parser:
                 Utility.print_fucking_stuff("User id "+str(user_id) + " and blood group "+str(words))
                 # TODO -> work here. blood group and location.
                 MessageReply.echo_response(user_id, "Blood group: "+str(words))
+                DB_HANDLER.flow_controller_insert(user_id, ConversationCodes.CONVERSATION_BLOOD_GROUP_ASK_TAG)
                 return [True, 0]
         return [False, 0]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DataDump, UserInformation, DonationHistory, ErrorLogger, UserStatus
+from .models import *
 
 
 class DumpMessageSerializer(serializers.ModelSerializer):
@@ -29,4 +29,10 @@ class StatusSerializer(serializers.ModelSerializer):
 class LoggerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ErrorLogger
+        fields = '__all__'
+
+
+class FlowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FlowController
         fields = '__all__'

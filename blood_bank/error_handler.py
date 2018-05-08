@@ -43,13 +43,6 @@ class ErrorHandler:
         error_counter = request_query.count() + 1
         del request_query
 
-        if error_code is None:
-            error_code = -1
-        if error_subcode is None:
-            error_subcode = -1
-        if error_type is None:
-            error_type = -1
-
         payload = {
             TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(25))),
             TAG_ERROR_COUNTER: error_counter,
