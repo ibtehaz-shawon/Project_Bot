@@ -85,3 +85,21 @@ class ErrorLogger(models.Model):
     errorCode = models.IntegerField(default=-1, blank=True, null=True)
     errorSubCode = models.IntegerField(default=-1, blank=True, null=True)
     errorType = models.CharField(default=None, max_length=1000, blank=True, null=True)
+
+
+"""
+Handles the data flow issue during the conversation.
+"""
+class FlowController(models.Model):
+    userID = models.ForeignKey(UserInformation, on_delete=models.CASCADE)
+    previousRequest = models.CharField(max_length=20, null=False, blank=False)
+    expirationDate = models.DateTimeField(editable=False)
+
+    def save(self):
+        from datetime import datetime, timedelta
+        # TODO: This delta time needs to customize based on requirement later
+        delta = timedelta(days=1)
+
+        if not self.userID:
+            self.expirationDate = datetime.now() + delta
+            super(FlowController, self).save()
