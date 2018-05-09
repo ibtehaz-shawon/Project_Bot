@@ -94,4 +94,5 @@ class FlowController(models.Model):
     userID = models.ForeignKey(UserInformation, on_delete=models.CASCADE)
     requestIdentifier = models.CharField(max_length=20, null=False, blank=False)
     expirationDate = models.DateTimeField("Request Expiration Date")
+    status = models.CharField(max_length=20, null=False, default="Opened")
 

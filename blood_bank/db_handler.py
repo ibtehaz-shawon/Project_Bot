@@ -139,6 +139,7 @@ class DB_HANDLER(object):
             if not DB_HANDLER().unique_user_check(fb_user_id):
                 return 2 ## user is old.
             db_id = str(binascii.hexlify(os.urandom(10)))
+            # .decode("utf-8")
             payload = {
                 TAG_USER_TABLE_ID: db_id,
                 TAG_FB_USERID: fb_user_id,
