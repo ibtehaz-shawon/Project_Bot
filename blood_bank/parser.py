@@ -320,7 +320,7 @@ class Parser:
 
             # A new status is opened for this user.
             DB_HANDLER.flow_controller_insert(user_id,
-                                              ConversationCodes.CONVERSATION_BLOOD_GROUP_ASK_TAG,
+                                              ConversationCodes.CONVERSATION_BLOOD_GROUP_ASK_TAG, 1,
                                               ConversationCodes.CONVERSATION_BLOOD_GROUP_STATUS_OPENED)
         elif missing_information_status == 101:
             #missing location. GET THEM
