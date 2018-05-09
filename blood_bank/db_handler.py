@@ -4,7 +4,7 @@ from time import gmtime, strftime
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from blood_bank.custom_codes import ReturnCodes
+from blood_bank.custom_codes import ReturnCodes, ConversationCodes
 from blood_bank.error_handler import ErrorHandler
 from blood_bank.serializer import *
 from blood_bank.utility import nlp_parser, Utility
@@ -44,6 +44,7 @@ TAG_ERROR_COUNTER = 'errorCounter'
 TAG_ERROR_USER_ID = 'fb_user_id'
 TAG_REQUEST_IDENTIFIER = 'requestIdentifier'
 TAG_EXPIRATION_DATE = 'expirationDate'
+TAG_STATUS = 'status'
 
 
 """
@@ -138,7 +139,7 @@ class DB_HANDLER(object):
         try:
             if not DB_HANDLER().unique_user_check(fb_user_id):
                 return 2 ## user is old.
-            db_id = str(binascii.hexlify(os.urandom(10)))
+            db_id = str((binascii.hexlify(os.urandom(10))).decode("utf-8"))
             # .decode("utf-8")
             payload = {
                 TAG_USER_TABLE_ID: db_id,
@@ -411,7 +412,8 @@ class DB_HANDLER(object):
     """
 
     @classmethod
-    def flow_controller_insert(cls, fb_user_id, request_identifier, days = 1):
+    def flow_controller_insert(cls, fb_user_id, request_identifier, days = 1,
+                               status = ConversationCodes.CONVERSATION_BLOOD_GROUP_STATUS_OPENED):
         Utility.print_fucking_stuff("flow controller insertion")
         try:
             if fb_user_id is None:
@@ -431,6 +433,7 @@ class DB_HANDLER(object):
                     TAG_USER_ID: user_id,
                     TAG_REQUEST_IDENTIFIER: str(request_identifier),
                     TAG_EXPIRATION_DATE: expiration_date,
+                    TAG_STATUS: str(status)
                 }
                 serialized_data = FlowSerializer(data=payload)
                 if serialized_data.is_valid():

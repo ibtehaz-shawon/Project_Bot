@@ -62,6 +62,8 @@ class MessageReply:
         except BaseException as error:
             ErrorHandler().error_logger("Base exception : "+str(error), user_id, "echo_response - Message Reply")
 
+
+
     @classmethod
     def quick_reply_text(cls, user_id, response_text, choices, postbacks):
         """

@@ -44,7 +44,7 @@ class ErrorHandler:
         del request_query
 
         payload = {
-            TAG_ERROR_INSTANCE_NO: str(binascii.hexlify(os.urandom(25))),
+            TAG_ERROR_INSTANCE_NO: str((binascii.hexlify(os.urandom(25))).decode("utf-8")),
             TAG_ERROR_COUNTER: error_counter,
             TAG_USER_ID: facebook_id,
             TAG_ERROR_MESSAGE: error_message,

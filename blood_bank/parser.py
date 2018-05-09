@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.http import HttpResponse
 
-from blood_bank.custom_codes import ConversationCodes
+from blood_bank.custom_codes import ConversationCodes, PostbackCodes
 from blood_bank.db_handler import DB_HANDLER
 from blood_bank.error_handler import ErrorHandler
 from blood_bank.message_reply import MessageReply
@@ -198,14 +198,17 @@ class Parser:
                     return HttpResponse(status=200)
                 print("Current user id --> " + str(user_id) + " result is --> " + str(user_status))
 
+            #TODO: check the flow condition here for future references. Insert blood group where In Database?
+            conditioning_status = Parser().__conditioning(user_id, str(message_data['message']['text']).upper())
+
+
+            ## status object might be important. Its a list.
             # TODO --------------------------------------------------------------
             # TODO --------------------------------------------------------------
             # TODO -> this echo back reply is not necessary on future references.
             # TODO --------------------------------------------------------------
             # TODO --------------------------------------------------------------
-            Parser().__temporary_conditioning(user_id, str(message_data['message']['text']).upper())
-            ## status object might be important. Its a list.
-            if not status[0]:
+            if not status[0] and not conditioning_status:
                 ## Parse message for location, blood group and emergency blood needed from here
                 MessageReply().echo_response(user_id, str(message_data['message']['text']).lower())
             return HttpResponse(status=200)
@@ -314,6 +317,11 @@ class Parser:
             #missing blood group
             MessageReply.echo_response(user_id, "I'll need to register your blood group."
                                                 " Can you tell me what is your blood group?")
+
+            # A new status is opened for this user.
+            DB_HANDLER.flow_controller_insert(user_id,
+                                              ConversationCodes.CONVERSATION_BLOOD_GROUP_ASK_TAG,
+                                              ConversationCodes.CONVERSATION_BLOOD_GROUP_STATUS_OPENED)
         elif missing_information_status == 101:
             #missing location. GET THEM
             MessageReply.echo_response(user_id, "Register Location later.")
@@ -352,6 +360,7 @@ class Parser:
 
     """
     Will parse through message for keywords that has not gone through OK with facebook NLP
+    #REJECT RIGHT NOW - Date : May 09, 2018. 
     """
     @classmethod
     def __regex(cls, user_id, original_message_text):
@@ -366,8 +375,11 @@ class Parser:
         return None
 
 
+    """
+    This function performs the entire conditioning structure for the blood group and location parsing. 
+    """
     @classmethod
-    def __temporary_conditioning(cls, user_id, message_text):
+    def __conditioning(cls, user_id, message_text, location = False):
         if user_id is None or message_text is None:
             ErrorHandler.error_logger("blood group or location, none value", user_id,
                                       "__temporary_conditioning")
@@ -377,8 +389,14 @@ class Parser:
         for words in message_text:
             if words in blood_group:
                 Utility.print_fucking_stuff("User id "+str(user_id) + " and blood group "+str(words))
-                # TODO -> work here. blood group and location.
-                MessageReply.echo_response(user_id, "Blood group: "+str(words))
-                DB_HANDLER.flow_controller_insert(user_id, ConversationCodes.CONVERSATION_BLOOD_GROUP_ASK_TAG)
-                return [True, 0]
-        return [False, 0]
+                # blood group.
+                # This will open a new status code in the flow control for this user.
+                MessageReply.quick_reply_text(user_id,
+                                              ConversationCodes.CONVERSATION_ASK_BLD_GRP_AFFIRMATION + str(words),
+                                              [ConversationCodes.CONVERSATION_YES,
+                                               ConversationCodes.CONVERSATION_NO],
+                                              [PostbackCodes.POSTBACK_BLOOD_GROUP_YES,
+                                               PostbackCodes.POSTBACK_BLOOD_GROUP_NO])
+                ## Update function flow status here to Pending.
+                return True
+        return False

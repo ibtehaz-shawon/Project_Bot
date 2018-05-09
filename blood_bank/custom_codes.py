@@ -1,5 +1,14 @@
+class PostbackCodes:
+    POSTBACK_BLOOD_GROUP_YES = 2001
+    POSTBACK_BLOOD_GROUP_NO = 2002
+
+
 class ConversationCodes:
     CONVERSATION_BLOOD_GROUP_ASK_TAG = 1001
+    CONVERSATION_BLOOD_GROUP_STATUS_OPENED = "Opened"
+    CONVERSATION_YES = "Yes :)"
+    CONVERSATION_NO = "No :("
+    CONVERSATION_ASK_BLD_GRP_AFFIRMATION = "Is this your blood group? "
 
 
 
